@@ -5,16 +5,23 @@ namespace App\Imports;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Imports\HeadingRowFormatter;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use App\Models\TotalLeased;
 
 HeadingRowFormatter::default('none');
 
-class TotalLeasedImport implements ToModel, WithHeadingRow
+class TotalLeasedImport implements ToModel, WithHeadingRow, WithMultipleSheets
 {
     /**
      * @var int
      */
     public $headingRow = 1;
+    public $sheetName;
+
+    public function __construct($sheetName)
+    {
+        $this->sheetName = $sheetName;
+    }
 
     public function model(array $row)
     {
@@ -33,5 +40,12 @@ class TotalLeasedImport implements ToModel, WithHeadingRow
         ];
 
         TotalLeased::updateOrCreate($searchCriteria, $data);
+    }
+
+    public function sheets(): array
+    {
+        return [
+            $this->sheetName => $this,
+        ];
     }
 }

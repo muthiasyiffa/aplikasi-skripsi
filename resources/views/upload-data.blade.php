@@ -24,7 +24,7 @@
                     @endif
 
 
-                    <form id="uploadForm" action="{{ route('upload') }}" method="POST" enctype="multipart/form-data">
+                    <form id="uploadForm" action="{{ route('upload') }}" method="POST" target="_blank" enctype="multipart/form-data">
                         <input type="file" name="excel_file" id="excel_file" class="hidden" accept=".xlsx, .xls" onchange="updateFileName()">
                         <br>
 
@@ -38,7 +38,7 @@
                     </form>
 
                 </div>
-                
+
             </div>
         </div>
     </div>

@@ -5,9 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\DataImport;
+use App\Imports\SalaesOperatorImport;
 use App\Imports\TotalLeasedImport;
-use App\Imports\SO22Import;
-use App\Imports\SO23Import;
 
 class UploadDataController extends Controller
 {
@@ -29,12 +28,17 @@ class UploadDataController extends Controller
         ]);
         // Ambil file yang diupload
         $file = $request->file('excel_file');
-        
-        Excel::import(new DataImport(), $file);
-        
+        $import = new DataImport();
+        Excel::import($import, $file);
+
+        foreach ($import->getSheetNames() as $index => $sheetName) {
+            if ($index == 0) {;
+                Excel::import(new TotalLeasedImport($sheetName), $file);
+            } else {
+                Excel::import(new SalaesOperatorImport($sheetName), $file);
+            }
+        }
 
         return redirect()->back()->with('success', 'Data uploaded and updated successfully.');
     }
-
-
 }
