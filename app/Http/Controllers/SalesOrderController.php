@@ -2,13 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SO22;
+use App\Models\SalesOrder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
 
-class SalesOrder22Controller extends Controller
+class SalesOrderController extends Controller
 {
     //
     public function __construct()
@@ -18,30 +15,23 @@ class SalesOrder22Controller extends Controller
 
     public function index()
     {
-        $totalTowerCount = SO22::count();
-        
-        $geojsonFiles = File::files(public_path('js/geojson/province'));
+        return '';
+    }
+
+    public function show($tahun)
+    {
+        $totalTowerCount = SalesOrder::where('tahun', $tahun)->count();
 
         // Mengambil data jumlah tower per pulau
-        $towerCountsByPulau = SO22::select('pulau', DB::raw('count(*) as total'))
-            ->groupBy('pulau')
-            ->get();
-
-        // Mengambil data jumlah tower per pulau dan sow2
-        $towerCountsByPulauSow = SO22::select('pulau','sow2', DB::raw('count(*) as total'))
-            ->groupBy('pulau','sow2')
-            ->get();
-
+        $towerCountsByPulau = SalesOrder::select('pulau', \DB::raw('count(*) as total'))->where('tahun', $tahun)->groupBy('pulau')->get();
         // Mengambil data jumlah tower per sow2
-        $towerCountsBySow = SO22::select('sow2', DB::raw('count(*) as total'))
-            ->groupBy('sow2')
-            ->get();
-
+        $towerCountsBySow = SalesOrder::select('sow2', \DB::raw('count(*) as total'))->where('tahun', $tahun)->groupBy('sow2')->get();
+        // Mengambil data jumlah tower per pulau dan sow2
+        $towerCountsByPulauSow = SalesOrder::select('pulau', 'sow2', \DB::raw('count(*) as total'))->where('tahun', $tahun)->groupBy('pulau', 'sow2')->get();
         // Mengambil data jumlah tower per sow2 berdasarkan kat_tower
-        $towerCountsBySowKatTower = SO22::select('sow2', 'kat_tower', DB::raw('count(*) as total'))
-        ->where('sow2', 'COLO')
-        ->groupBy('sow2', 'kat_tower')
-        ->get();
+        $towerCountsBySowKatTower = SalesOrder::select('kat_tower', 'sow2', \DB::raw('count(*) as total'))->where('sow2', 'COLO')->where('tahun', $tahun)->groupBy('sow2', 'kat_tower')->get();
+
+        $geojsonFiles = \File::files(public_path('js/geojson/province'));
 
         // Menyiapkan array untuk menyimpan data tower colo per area
         $coloDataByKatTower = [];
@@ -57,7 +47,7 @@ class SalesOrder22Controller extends Controller
             }
         }
 
-        return view('salesorder22', [
+        return view('sales-order', [
             'geojsonFiles' => $geojsonFiles,
             'totalTowerCount' => $totalTowerCount,
             'towerCountsByPulau' => $towerCountsByPulau,

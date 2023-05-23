@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\SalesOrder;
 use App\Models\TotalLeased;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -29,7 +30,7 @@ class HomeController extends Controller
     {
         // Mengambil total jumlah tower
         $totalTowerCount = TotalLeased::count();
-        
+
         $geojsonFiles = File::files(public_path('js/geojson/province'));
 
         // Mengambil data jumlah tower per pulau
@@ -38,8 +39,8 @@ class HomeController extends Controller
             ->get();
 
         // Mengambil data jumlah tower per pulau dan sow2
-        $towerCountsByPulauSow = TotalLeased::select('pulau','sow2', DB::raw('count(*) as total'))
-            ->groupBy('pulau','sow2')
+        $towerCountsByPulauSow = TotalLeased::select('pulau', 'sow2', DB::raw('count(*) as total'))
+            ->groupBy('pulau', 'sow2')
             ->get();
 
         // Mengambil data jumlah tower per sow2
@@ -49,9 +50,9 @@ class HomeController extends Controller
 
         // Mengambil data jumlah tower per sow2 berdasarkan area
         $towerCountsBySowArea = TotalLeased::select('sow2', 'area', DB::raw('count(*) as total'))
-        ->where('sow2', 'COLO')
-        ->groupBy('sow2', 'area')
-        ->get();
+            ->where('sow2', 'COLO')
+            ->groupBy('sow2', 'area')
+            ->get();
 
         // Menyiapkan array untuk menyimpan data tower colo per area
         $coloDataByArea = [];

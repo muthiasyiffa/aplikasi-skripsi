@@ -15,9 +15,9 @@
 
     <!-- jQuery terlebih dahulu -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    
+
     <script src="https://unpkg.com/@popperjs/core@2.11.6/dist/umd/popper.min.js"
-    
+
     <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"></script>
 
@@ -78,15 +78,19 @@
                                     </li>
                                 @endif
                             @endif
-                            
+
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     Monitoring
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('salesorder22') }}">Sales Order 2022</a>
-                                    <a class="dropdown-item" href="{{ route('salesorder23') }}">Sales Order 2023</a>
+                                    @php
+                                        $salesOrderTahun = \App\Models\SalesOrder::select('tahun')->groupBy('tahun')->get();
+                                    @endphp
+                                    @foreach ($salesOrderTahun as $item)
+                                        <a class="dropdown-item" href="{{ route('sales-order.tahun', ['tahun' => $item->tahun]) }}">Sales Order {{ $item->tahun }}</a>
+                                    @endforeach
                                 </div>
                             </li>
                             <li class="nav-item dropdown">
