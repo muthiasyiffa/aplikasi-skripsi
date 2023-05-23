@@ -20,7 +20,7 @@
                     </div>
                     <div class="col">
                         <div class="card chart-cd shadow-sm">
-                            <button type="button" id="info-icon" class="btn btn-light" data-bs-toggle="popover" data-bs-placement="bottom" data-bs-content="content">
+                            <button type="button" id="info-icon" class="btn btn-light" data-bs-toggle="popover" data-bs-placement="bottom">
                                 <i class="fas fa-info-circle"></i>
                             </button>
                             <div class="chart-container">
@@ -54,7 +54,7 @@
                             </div>
                         </div>
                     </div>
-                </div>            
+                </div>
             </div>
         </div>
     </div>
@@ -65,7 +65,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.css" />
 
 <script>
-    
+
     document.addEventListener('DOMContentLoaded', function () {
         var map = L.map('map', {
             minZoom: 5,
@@ -122,7 +122,7 @@
 
                                 // Menambahkan persentase ke dalam tooltip
                                 var percentage = (totalTowerPulau / totalTower * 100).toFixed(2);
-                                var tooltipContent = '<span class="tooltip-title">{{ $towerCount->pulau }}</span> <br>'; 
+                                var tooltipContent = '<span class="tooltip-title">{{ $towerCount->pulau }}</span> <br>';
                                 tooltipContent += 'Percentage: ' + percentage + '% <br>';
 
                                 tooltipContent += 'Total : {{ $towerCount->total }} site<br>';
@@ -206,7 +206,7 @@
                         display: true,
                         text: 'SOW Sales Order 2022',
                         font: {
-                            size: 16 
+                            size: 16
                         }
                     },
                     legend: {
@@ -250,8 +250,7 @@
             }
         });
 
-        const popoverTrigger = document.getElementById('info-icon');
-        const popover = new bootstrap.Popover(popoverTrigger, {
+        const popover = new bootstrap.Popover(document.getElementById('info-icon'), {
             container: 'body',
             html: true,
             content: function () {
@@ -326,7 +325,7 @@
                             bottom: 30
                         },
                         font: {
-                            size: 16 
+                            size: 16
                         }
                     },
                     legend: {
@@ -366,7 +365,7 @@
             font-weight: bold;
             font-size: 17px;
         }
-        
+
         .custom-info {
             position: absolute;
             right: 0px;
