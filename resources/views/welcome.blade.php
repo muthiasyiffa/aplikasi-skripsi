@@ -11,6 +11,12 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js" integrity="sha384-Y4oOpwW3duJdCWv5ly8SCFYWqFDsfob/3GkgExXKV4idmbt98QcxXYs9UoXAB7BZ" crossorigin="anonymous"></script>
     <title>MISSO XL</title>
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
@@ -34,11 +40,11 @@
                 </span>
             </div>
         </div>
-        <footer class="welcome-footer">
-            <span class="welcome-text2">
-                © 2023 Sales2 Dayamitra Telekomunikasi, All Rights Reserved.
-            </span>
-        </footer>
     </div>
+    <footer class="footer">
+        <div class="container">
+            <p>© 2023 Sales2 Dayamitra Telekomunikasi, All Rights Reserved.</p>
+        </div>
+    </footer>
   </body>
 </html>

@@ -53,7 +53,8 @@ class SalesOrderController extends Controller
             'towerCountsByPulau' => $towerCountsByPulau,
             'towerCountsByPulauSow' => $towerCountsByPulauSow,
             'towerCountsBySow' => $towerCountsBySow,
-            'coloDataByKatTower' => $coloDataByKatTower
+            'coloDataByKatTower' => $coloDataByKatTower,
+            'tahun' => $tahun
         ]);
     }
 }

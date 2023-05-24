@@ -13,6 +13,24 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <style>
+        html{
+            height: 100%;
+        }
+
+        body {
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        footer {
+            background-color: #f2f2f2;
+            padding-top: 10px;
+            margin-top: auto;
+        }
+    </style>
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
 <body>
@@ -103,18 +121,38 @@
             @yield('content')
         </main>
     </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2023 Sales2 Dayamitra Telekomunikasi, All Rights Reserved.</p>
+        </div>
+    </footer>
+
     <script>
-        $('[data-bs-toggle="dropdown"]').click(function (e) {
-            e.preventDefault();
-            $(this).parent().toggleClass('show');
-            $(this).parent().find('.dropdown-menu').toggleClass('show');
-        });
-        $(document).click(function (e) {
-            const target = e.target;
-            if (!$(target).is('.dropdown') && !$(target).parents().is('.dropdown')) {
-                $('div.dropdown-menu.show').removeClass('show');
-                $('div.dropdown.show, li.dropdown.show').removeClass('show');
-            }
+        $(document).ready(function() {
+            $('[data-bs-toggle="dropdown"]').click(function (e) {
+                e.preventDefault();
+                var $parent = $(this).parent();
+                var $dropdownMenu = $parent.find('.dropdown-menu');
+
+                // Tutup semua dropdown menu yang sedang terbuka
+                $('.dropdown-menu.show').not($dropdownMenu).removeClass('show');
+                $('.dropdown.show').not($parent).removeClass('show');
+
+                // Buka atau tutup dropdown menu saat ini
+                $parent.toggleClass('show');
+                $dropdownMenu.toggleClass('show');
+            });
+
+            $(document).click(function (e) {
+                var $target = $(e.target);
+
+                // Tutup dropdown menu saat mengklik di luar dropdown
+                if (!$target.is('.dropdown') && !$target.parents().is('.dropdown')) {
+                    $('div.dropdown-menu.show').removeClass('show');
+                    $('div.dropdown.show, li.dropdown.show').removeClass('show');
+                }
+            });
         });
     </script>
 </body>

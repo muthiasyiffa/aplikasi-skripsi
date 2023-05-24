@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\DataImport;
-use App\Imports\SalaesOperatorImport;
+use App\Imports\SalesOperatorImport;
 use App\Imports\TotalLeasedImport;
 
 class UploadDataController extends Controller
@@ -35,9 +35,10 @@ class UploadDataController extends Controller
             if ($index == 0) {;
                 Excel::import(new TotalLeasedImport($sheetName), $file);
             } else {
-                Excel::import(new SalaesOperatorImport($sheetName), $file);
+                Excel::import(new SalesOperatorImport($sheetName), $file);
             }
         }
+        set_time_limit(0);
 
         return redirect()->back()->with('success', 'Data uploaded and updated successfully.');
     }

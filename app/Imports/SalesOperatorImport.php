@@ -11,7 +11,7 @@ use Carbon\Carbon;
 
 HeadingRowFormatter::default('none');
 
-class SalaesOperatorImport implements ToModel, WithHeadingRow, WithMultipleSheets
+class SalesOperatorImport implements ToModel, WithHeadingRow, WithMultipleSheets
 {
     /**
      * @var int

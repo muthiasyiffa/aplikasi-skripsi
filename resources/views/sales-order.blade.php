@@ -5,7 +5,10 @@
     <div class="row justify-content-center">
         <div class="col-md-12">
         <div class="card">
-                <div class="card-header">{{ __('Sales Order 2022') }}</div>
+                <div class="card-header">
+                    {{ __('Sales Order') }}
+                    {{ $tahun }}    
+                </div>
                 <div class="card m-3 map-container">
                     <div id="map" style="height: 500px;"></div>
                 </div>
@@ -204,7 +207,7 @@
                 plugins: {
                     title: {
                         display: true,
-                        text: 'SOW Sales Order 2022',
+                        text: 'SOW Sales Order {{ $tahun }}',
                         font: {
                             size: 16
                         }

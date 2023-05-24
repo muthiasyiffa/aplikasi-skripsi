@@ -4,26 +4,36 @@
     box-sizing: border-box;
 }
 
+html{
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+footer {
+  background-color: #f2f2f2;
+  padding-top: 15px;
+  margin-top: auto;
+}
+
 .welcome-container {
-    width: 100%;
-    display: flex;
-    overflow: auto;
     align-items: center;
     flex-direction: column;
-    justify-content: flex-end;
 }
-  .welcome-image1 {
-    width: 56px;
-    align-self: flex-end;
-    margin-left: 20px;
-  }
   .welcome-btn-group {
     display: flex;
     align-items: center;
     flex-direction: row;
     justify-content: space-between;
+    flex: 1;
   }
   .welcome-banner {
+    height: 650px;
+    flex: 1;
     width: 100%;
     display: flex;
     padding: 48px;
@@ -60,9 +70,8 @@
     padding-bottom: 32px;
     justify-content: space-between;
   }
-  @media(max-width: 1366px) {
+  @media(max-width: 1680px) {
     .welcome-banner {
-      height: 570px;
       padding: 48px;
       position: relative;
       align-self: center;

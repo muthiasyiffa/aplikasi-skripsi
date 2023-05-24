@@ -28,7 +28,7 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 Route::middleware(['auth', 'role:operator'])->group(function () {
     Route::get('/upload-data', [App\Http\Controllers\UploadDataController::class, 'index'])->name('upload-data')->middleware('auth', 'verified');
-    Route::post('/upload-data/success', [App\Http\Controllers\UploadDataController::class, 'upload'])->name('upload')->middleware('auth', 'verified');
+    Route::post('/upload-data', [App\Http\Controllers\UploadDataController::class, 'upload'])->name('upload')->middleware('auth', 'verified');
 });
 
 Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'index'])->name('profile')->middleware('auth', 'verified');
