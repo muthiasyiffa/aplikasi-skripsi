@@ -190,7 +190,7 @@
                                         var meta = chart.getDatasetMeta(0);
                                         var dataItem = data.datasets[0].data[i];
                                         var total = meta.total;
-                                        var percentage = ((dataItem / total) * 100).toFixed(2);
+                                        var percentage = ((dataItem / total) * 100).toFixed(0);
                                         return {
                                             text: label + ' (' + percentage + '%)',
                                             fillStyle: data.datasets[0].backgroundColor[i],
@@ -208,7 +208,7 @@
                     onComplete: function() {
                         var doughnutHoleText = document.getElementById('doughnutHoleText');
                         var chartArea = doughnutChart.chartArea;
-                        var centerX = (chartArea.left + chartArea.right) / 2;
+                        var centerX = (chartArea.left + chartArea.right) / 2.04;
                         var centerY = (chartArea.top + chartArea.bottom) / 2.5;
                         var towerCount = {{ $totalTowerCount }};
 
@@ -322,7 +322,7 @@
         }
 
         .col {
-            padding: 15px;
+            padding: 23px;
         }
 
         .tower-count-text {

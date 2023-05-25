@@ -12,7 +12,7 @@
                 <div class="card m-3 map-container">
                     <div id="map" style="height: 500px;"></div>
                 </div>
-                <div class="row row-cols-1 row-cols-md-2 g-4 px-4">
+                <div class="row row-cols-1 row-cols-md-2 g-4 px-4 mt-1">
                     <div class="col">
                         <div class="card chart-cd shadow-sm">
                             <div class="chart-container">
@@ -32,28 +32,44 @@
                         </div>
                     </div>
                 </div>
-                <div class="row row-cols-1 row-cols-md-3 g-4 px-4">
+                <div class="row row-cols-1 row-cols-md-3 g-4 px-4 mt-1">
                     <div class="col">
                         <div class="card chart-cd shadow-sm">
                             <div class="chart-container">
-                                <canvas id="doughnutChart" width="400" height="400"></canvas>
-                                <div id="doughnutHoleText"></div>
+                                <canvas id="doughnutChart1" width="400" height="400"></canvas>
+                                <div id="doughnutHoleText1"></div>
                             </div>
                         </div>
                     </div>
                     <div class="col">
                         <div class="card chart-cd shadow-sm">
                             <div class="chart-container">
-                                <canvas id="doughnutChart" width="400" height="400"></canvas>
-                                <div id="doughnutHoleText"></div>
+                                <canvas id="doughnutChart2" width="400" height="400"></canvas>
+                                <div id="doughnutHoleText2"></div>
                             </div>
                         </div>
                     </div>
                     <div class="col">
                         <div class="card chart-cd shadow-sm">
                             <div class="chart-container">
-                                <canvas id="doughnutChart" width="400" height="400"></canvas>
-                                <div id="doughnutHoleText"></div>
+                                <canvas id="doughnutChart3" width="400" height="400"></canvas>
+                                <div id="doughnutHoleText3"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-4 px-4 mt-1">
+                    <div class="col-md-5">
+                        <div class="card chart-cd shadow-sm">
+                            <div class="chart-container">
+                                <canvas id="doughnutChart4" width="400" height="400"></canvas>
+                                <div id="doughnutHoleText4"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="card chart-cd shadow-sm">
+                            <div class="chart-container">
                             </div>
                         </div>
                     </div>
@@ -70,6 +86,7 @@
 <script>
 
     document.addEventListener('DOMContentLoaded', function () {
+//data maps sebaran tower
         var map = L.map('map', {
             minZoom: 5,
             maxZoom: 19,
@@ -177,8 +194,8 @@
         infoDiv.style.zIndex = '1000';
 
         map.getContainer().appendChild(infoDiv);
-
-        // Mengambil data untuk doughnut chart
+//chart SOW
+        // Mengambil data untuk doughnut chart SOW
         var sowData = [];
         var sowLabels = [];
 
@@ -187,7 +204,7 @@
             sowLabels.push('{{ $towerCountSow->sow2 }}');
         @endforeach
 
-        // Membuat doughnut chart
+        // Membuat doughnut chart SOW
         var doughnutChart = new Chart(document.getElementById('doughnutChart'), {
             type: 'doughnut',
             data: {
@@ -222,7 +239,7 @@
                                         var meta = chart.getDatasetMeta(0);
                                         var dataItem = data.datasets[0].data[i];
                                         var total = meta.total;
-                                        var percentage = ((dataItem / total) * 100).toFixed(2);
+                                        var percentage = ((dataItem / total) * 100).toFixed(0);
                                         return {
                                             text: label + ' (' + percentage + '%)',
                                             fillStyle: data.datasets[0].backgroundColor[i],
@@ -252,41 +269,7 @@
                 }
             }
         });
-
-        const popover = new bootstrap.Popover(document.getElementById('info-icon'), {
-            container: 'body',
-            html: true,
-            content: function () {
-                // Mengambil data tower COLO
-                var coloData = @json($coloDataByKatTower);
-
-                // Menghitung total tower COLO
-                var coloTotal = Object.values(coloData).reduce((total, count) => total + count, 0);
-
-                // Mengkategorikan tower sebagai Tower Akuisisi atau Tower B2S Mitratel
-                var akuisisiTowers = ['Titan', 'Edelweiss 1A', 'Edelweiss 1B', 'Edelweiss 2', 'Edelweiss 3', 'UNO', 'Akuisisi'];
-
-                var akuisisiData = {};
-
-                // Memisahkan data tower berdasarkan kategori
-                Object.entries(coloData).forEach(([katTower, count]) => {
-                    if (akuisisiTowers.includes(katTower)) {
-                        akuisisiData[katTower] = count;
-                    }
-                });
-
-                // Menghitung total tower akuisisi
-                var akuisisiTotal = Object.values(akuisisiData).reduce((total, count) => total + count, 0);
-
-                // Membuat konten popover
-                var content = 'Dari total tower colo sebanyak <b>' + coloTotal + ' site</b>, terdapat kategori tower Bangun Mandiri atau biasa disebut B2S dan kategori tower Telkom Group. Kedua kategori tersebut <b>bukan</b> merupakan site akuisisi.';
-                content += '<br><br>'
-                content += '<b>Total Site Akuisisi: '+ akuisisiTotal + ' site</b>';
-
-                return content;
-            }
-        });
-
+//chart kat_tower
         // Mengambil data tower colo per area dari controller
         var coloDataByKatTower = {!! json_encode($coloDataByKatTower) !!};
 
@@ -352,6 +335,343 @@
             }
         });
 
+        const popover = new bootstrap.Popover(document.getElementById('info-icon'), {
+            container: 'body',
+            html: true,
+            content: function () {
+                // Mengambil data tower COLO
+                var coloData = @json($coloDataByKatTower);
+
+                // Menghitung total tower COLO
+                var coloTotal = Object.values(coloData).reduce((total, count) => total + count, 0);
+
+                // Mengkategorikan tower sebagai Tower Akuisisi atau Tower B2S Mitratel
+                var akuisisiTowers = ['Titan', 'Edelweiss 1A', 'Edelweiss 1B', 'Edelweiss 2', 'Edelweiss 3', 'UNO', 'Akuisisi'];
+
+                var akuisisiData = {};
+
+                // Memisahkan data tower berdasarkan kategori
+                Object.entries(coloData).forEach(([katTower, count]) => {
+                    if (akuisisiTowers.includes(katTower)) {
+                        akuisisiData[katTower] = count;
+                    }
+                });
+
+                // Menghitung total tower akuisisi
+                var akuisisiTotal = Object.values(akuisisiData).reduce((total, count) => total + count, 0);
+
+                // Membuat konten popover
+                var content = 'Dari total tower colo sebanyak <b>' + coloTotal + ' site</b>, terdapat kategori tower Bangun Mandiri atau biasa disebut B2S dan kategori tower Telkom Group. Kedua kategori tersebut <b>bukan</b> merupakan site akuisisi.';
+                content += '<br><br>'
+                content += '<b>Total Site Akuisisi: '+ akuisisiTotal + ' site</b>';
+
+                return content;
+            }
+        });
+//chart tenant_existing
+        // Mengambil data untuk doughnut chart tenant_existing
+        var coloDataByTenantExisting = {!! json_encode($coloDataByTenantExisting) !!};
+
+        // Membuat array untuk label tenant dan data jumlah tower colo
+        var labelsTenant = Object.keys(coloDataByTenantExisting);
+        var coloCountsbyTenant = Object.values(coloDataByTenantExisting);
+        var totalColo = Object.values(coloDataByTenantExisting).reduce((total, count) => total + count, 0);
+
+        // Membuat doughnut chart tenant_existing
+        var doughnutChart1 = new Chart(document.getElementById('doughnutChart1'), {
+            type: 'doughnut',
+            data: {
+                labels: labelsTenant,
+                datasets: [{
+                    data: coloCountsbyTenant,
+                    backgroundColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(75, 192, 192)',
+                        'rgb(255, 205, 86)',
+                        'rgb(201, 203, 207)',
+                        'rgb(54, 162, 235)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Collocation Based Site Condition',
+                        font: {
+                            size: 16
+                        }
+                    },
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            generateLabels: function(chart) {
+                                var data = chart.data;
+                                if (data.labels.length && data.datasets.length) {
+                                    return data.labels.map(function(label, i) {
+                                        var meta = chart.getDatasetMeta(0);
+                                        var dataItem = data.datasets[0].data[i];
+                                        var total = meta.total;
+                                        var percentage = ((dataItem / total) * 100).toFixed(0);
+                                        return {
+                                            text: label + ' (' + percentage + '%)',
+                                            fillStyle: data.datasets[0].backgroundColor[i],
+                                            hidden: isNaN(dataItem) || meta.data[i].hidden,
+                                            index: i
+                                        };
+                                    });
+                                }
+                                return [];
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    onComplete: function() {
+                        var doughnutHoleText1 = document.getElementById('doughnutHoleText1');
+                        var chartArea1 = doughnutChart1.chartArea;
+                        var centerX1 = (chartArea1.left + chartArea1.right) / 1.95;
+                        var centerY1 = (chartArea1.top + chartArea1.bottom) / 2.5;
+
+                        doughnutHoleText1.style.top = centerY1 + 'px';
+                        doughnutHoleText1.style.left = centerX1 + 'px';
+                        doughnutHoleText1.innerHTML = totalColo + '<br>Site';
+                        doughnutHoleText1.classList.add('doughnut-hole-text');
+                    }
+                }
+            }
+        });
+//chart area
+        // Mengambil data untuk doughnut chart area
+        var coloDataByArea = {!! json_encode($coloDataByArea) !!};
+
+        // Membuat array untuk label tenant dan data jumlah tower colo
+        var labelsArea = Object.keys(coloDataByArea);
+        var coloCountsbyArea = Object.values(coloDataByArea);
+        var totalColoArea = Object.values(coloDataByArea).reduce((total, count) => total + count, 0);
+
+        // Membuat doughnut chart area
+        var doughnutChart2 = new Chart(document.getElementById('doughnutChart2'), {
+            type: 'doughnut',
+            data: {
+                labels: labelsArea,
+                datasets: [{
+                    data: coloCountsbyArea,
+                    backgroundColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(75, 192, 192)',
+                        'rgb(255, 205, 86)',
+                        'rgb(54, 162, 235)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Collocation Based Site Acquisition',
+                        font: {
+                            size: 16
+                        }
+                    },
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            generateLabels: function(chart) {
+                                var data = chart.data;
+                                if (data.labels.length && data.datasets.length) {
+                                    return data.labels.map(function(label, i) {
+                                        var meta = chart.getDatasetMeta(0);
+                                        var dataItem = data.datasets[0].data[i];
+                                        var total = meta.total;
+                                        var percentage = ((dataItem / total) * 100).toFixed(0);
+                                        return {
+                                            text: label + ' (' + percentage + '%)',
+                                            fillStyle: data.datasets[0].backgroundColor[i],
+                                            hidden: isNaN(dataItem) || meta.data[i].hidden,
+                                            index: i
+                                        };
+                                    });
+                                }
+                                return [];
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    onComplete: function() {
+                        var doughnutHoleText2 = document.getElementById('doughnutHoleText2');
+                        var chartArea2 = doughnutChart2.chartArea;
+                        var centerX2 = (chartArea2.left + chartArea2.right) / 1.95;
+                        var centerY2 = (chartArea2.top + chartArea2.bottom) / 2.5;
+
+                        doughnutHoleText2.style.top = centerY2 + 'px';
+                        doughnutHoleText2.style.left = centerX2 + 'px';
+                        doughnutHoleText2.innerHTML = totalColoArea + '<br>Site';
+                        doughnutHoleText2.classList.add('doughnut-hole-text');
+                    }
+                }
+            }
+        });
+//chart demografi
+        // Mengambil data untuk doughnut chart demografi
+        var demographyData = [];
+        var demographyLabels = [];
+
+        @foreach ($towerCountsByDemography as $towerCountDemography)
+            demographyData.push({{ $towerCountDemography->total }});
+            demographyLabels.push('{{ $towerCountDemography->demografi }}');
+        @endforeach
+
+        // Membuat doughnut chart demografi
+        var doughnutChart3 = new Chart(document.getElementById('doughnutChart3'), {
+            type: 'doughnut',
+            data: {
+                labels: demographyLabels,
+                datasets: [{
+                    data: demographyData,
+                    backgroundColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(75, 192, 192)',
+                        'rgb(255, 205, 86)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Order Based on Demography',
+                        font: {
+                            size: 16
+                        }
+                    },
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            generateLabels: function(chart) {
+                                var data = chart.data;
+                                if (data.labels.length && data.datasets.length) {
+                                    return data.labels.map(function(label, i) {
+                                        var meta = chart.getDatasetMeta(0);
+                                        var dataItem = data.datasets[0].data[i];
+                                        var total = meta.total;
+                                        var percentage = ((dataItem / total) * 100).toFixed(0);
+                                        return {
+                                            text: label + ' (' + percentage + '%)',
+                                            fillStyle: data.datasets[0].backgroundColor[i],
+                                            hidden: isNaN(dataItem) || meta.data[i].hidden,
+                                            index: i
+                                        };
+                                    });
+                                }
+                                return [];
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    onComplete: function() {
+                        var doughnutHoleText3 = document.getElementById('doughnutHoleText3');
+                        var chartArea3 = doughnutChart3.chartArea;
+                        var centerX3 = (chartArea3.left + chartArea3.right) / 1.95;
+                        var centerY3 = (chartArea3.top + chartArea3.bottom) / 2.5;
+                        var towerCount = {{ $totalTowerCount }};
+
+                        doughnutHoleText3.style.top = centerY3 + 'px';
+                        doughnutHoleText3.style.left = centerX3 + 'px';
+                        doughnutHoleText3.innerHTML = towerCount + '<br>Site';
+                        doughnutHoleText3.classList.add('doughnut-hole-text');
+                    }
+                }
+            }
+        });
+//chart status site
+        // Mengambil data untuk doughnut chart status site
+        var statusData = [];
+        var statusLabels = [];
+
+        @foreach ($towerCountsByStatus as $towerCountStatus)
+            statusData.push({{ $towerCountStatus->total }});
+            statusLabels.push('{{ $towerCountStatus->final_status_site }}');
+        @endforeach
+
+        // Membuat doughnut chart status site
+        var doughnutChart4 = new Chart(document.getElementById('doughnutChart4'), {
+            type: 'doughnut',
+            data: {
+                labels: statusLabels,
+                datasets: [{
+                    data: statusData,
+                    backgroundColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(75, 192, 192)',
+                        'rgb(255, 205, 86)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Status Site Order XL {{ $tahun }}',
+                        font: {
+                            size: 16
+                        }
+                    },
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            generateLabels: function(chart) {
+                                var data = chart.data;
+                                if (data.labels.length && data.datasets.length) {
+                                    return data.labels.map(function(label, i) {
+                                        var meta = chart.getDatasetMeta(0);
+                                        var dataItem = data.datasets[0].data[i];
+                                        var total = meta.total;
+                                        var percentage = ((dataItem / total) * 100).toFixed(0);
+                                        return {
+                                            text: label + ' (' + percentage + '%)',
+                                            fillStyle: data.datasets[0].backgroundColor[i],
+                                            hidden: isNaN(dataItem) || meta.data[i].hidden,
+                                            index: i
+                                        };
+                                    });
+                                }
+                                return [];
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    onComplete: function() {
+                        var doughnutHoleText4 = document.getElementById('doughnutHoleText4');
+                        var chartArea4 = doughnutChart4.chartArea;
+                        var centerX4 = (chartArea4.left + chartArea4.right) / 1.95;
+                        var centerY4 = (chartArea4.top + chartArea4.bottom) / 2.5;
+                        var towerCount = {{ $totalTowerCount }};
+
+                        doughnutHoleText4.style.top = centerY4 + 'px';
+                        doughnutHoleText4.style.left = centerX4 + 'px';
+                        doughnutHoleText4.innerHTML = towerCount + '<br>Site';
+                        doughnutHoleText4.classList.add('doughnut-hole-text');
+                    }
+                }
+            }
+        });
+
     });
 </script>
 
@@ -387,9 +707,6 @@
             padding-top: 10px;
         }
 
-        .col {
-            padding: 15px;
-        }
 
         .tower-count-text {
             position: absolute;
@@ -416,6 +733,11 @@
 
         .popover-body {
             font-size: 14px; /* Ganti dengan ukuran font yang diinginkan */
+        }
+
+        .status-contain {
+            margin-top: 15px;
+            margin bottom: 15px;
         }
 
     </style>
