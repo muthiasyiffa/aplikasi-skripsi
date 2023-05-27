@@ -4,7 +4,7 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-12">
-        <div class="card">
+            <div class="card">
                 <div class="card-header">
                     {{ __('Sales Order') }}
                     {{ $tahun }}    
@@ -74,6 +74,27 @@
                         </div>
                     </div>
                 </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>PID</th>
+                            <th>Site ID</th>
+                            <th>Site Name</th>
+                            <th>Aging</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($salesOrders as $salesOrder)
+                        <tr>
+                            <td>{{ $salesOrder->pid }}</td>
+                            <td>{{ $salesOrder->site_id_tenant }}</td>
+                            <td>{{ $salesOrder->site_name }}</td>
+                            <td>{{ $salesOrder->aging_rfi_to_bak }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+
             </div>
         </div>
     </div>
@@ -363,7 +384,11 @@
                 // Membuat konten popover
                 var content = 'Dari total tower colo sebanyak <b>' + coloTotal + ' site</b>, terdapat kategori tower Bangun Mandiri atau biasa disebut B2S dan kategori tower Telkom Group. Kedua kategori tersebut <b>bukan</b> merupakan site akuisisi.';
                 content += '<br><br>'
-                content += '<b>Total Site Akuisisi: '+ akuisisiTotal + ' site</b>';
+                content += '<b>Total Site Akuisisi : '+ akuisisiTotal + ' site</b> <br> <br>';
+
+                //Notes Site akuisisi
+                content += '<b>Titan :</b> Site akuisisi dari <b>ISAT</b><br> <b>Edelweiss 1A, 1B, 2, dan 3 :</b> Site akuisisi dari <b>TSEL</b><br>';
+                content += '<b>UNO :</b> Site akuisisi dari <b>Telkom</b><br> <b>Akuisisi :</b> Site akuisisi dari <b>perusahaan kecil</b><br>';
 
                 return content;
             }
@@ -738,6 +763,10 @@
         .status-contain {
             margin-top: 15px;
             margin bottom: 15px;
+        }
+
+        .custom-popover {
+            --bs-popover-max-width: 100px;
         }
 
     </style>

@@ -20,7 +20,18 @@ class SalesOrderController extends Controller
 
     public function show($tahun)
     {
-        $totalTowerCount = SalesOrder::where('tahun', $tahun)->count();
+        $currentDate = \Carbon\Carbon::now()->toDateString();
+        $salesOrders = SalesOrder::where('tahun', $tahun)->get();
+        $totalTowerCount = $salesOrders->count();
+
+        foreach ($salesOrders as $salesOrder) {
+            $rfiDate = $salesOrder->rfi_date;
+            if ($rfiDate) {
+                $aging = \Carbon\Carbon::parse($rfiDate)->diffInDays($currentDate);
+                $salesOrder->aging_rfi_to_bak = $aging;
+                $salesOrder->save();
+            }
+        }
 
         // Mengambil data jumlah tower per pulau
         $towerCountsByPulau = SalesOrder::select('pulau', \DB::raw('count(*) as total'))->where('tahun', $tahun)->groupBy('pulau')->get();
@@ -94,7 +105,8 @@ class SalesOrderController extends Controller
             'coloDataByTenantExisting' => $coloDataByTenantExisting,
             'coloDataByArea' => $coloDataByArea,
             'towerCountsByDemography' => $towerCountsByDemography,
-            'towerCountsByStatus' => $towerCountsByStatus
+            'towerCountsByStatus' => $towerCountsByStatus,
+            'salesOrders' => $salesOrders
         ]);
     }
 }

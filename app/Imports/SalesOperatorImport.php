@@ -53,7 +53,6 @@ class SalesOperatorImport implements ToModel, WithHeadingRow, WithMultipleSheets
             'status_xl' => $statusXL,
             'status_lms' => $row['Status LMS'],
             'rfi_date' => $rfiDate,
-            'aging_rfi_to_bak' => $this->calculateAging($rfiDate),
         ];
 
         $searchCriteria = [
@@ -129,17 +128,6 @@ class SalesOperatorImport implements ToModel, WithHeadingRow, WithMultipleSheets
         }
 
         SalesOrder::updateOrCreate($searchCriteria, $data);
-    }
-
-    private function calculateAging($rfiDate)
-    {
-        $currentDate = Carbon::now();
-        $rfiDate = Carbon::parse($rfiDate);
-
-        // Menghitung selisih hari antara rfi_date dengan currentDate
-        $aging = $currentDate->diffInDays($rfiDate);
-
-        return $aging;
     }
 
     public function sheets(): array
