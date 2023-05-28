@@ -39,6 +39,10 @@ class SalesOrderController extends Controller
         $towerCountsBySow = SalesOrder::select('sow2', \DB::raw('count(*) as total'))->where('tahun', $tahun)->groupBy('sow2')->get();
         // Mengambil data jumlah tower per pulau dan sow2
         $towerCountsByPulauSow = SalesOrder::select('pulau', 'sow2', \DB::raw('count(*) as total'))->where('tahun', $tahun)->groupBy('pulau', 'sow2')->get();
+        // Mengambil data jumlah tower per sow2 "COLO" berdasarkan area
+        $towerCountsByAreaSow = SalesOrder::select('area', 'sow2', \DB::raw('count(*) as total'))->where('tahun', $tahun)->where('sow2', 'COLO')->groupBy('area', 'sow2')->get();
+        // Mengambil data jumlah tower per sow2 "B2S" berdasarkan area
+        $towerCountsByAreaB2S = SalesOrder::select('area', 'sow2', \DB::raw('count(*) as total'))->where('tahun', $tahun)->where('sow2', 'B2S')->groupBy('area', 'sow2')->get();
         // Mengambil data jumlah tower per sow2 "COLO" berdasarkan kat_tower
         $towerCountsBySowKatTower = SalesOrder::select('kat_tower', 'sow2', \DB::raw('count(*) as total'))->where('sow2', 'COLO')->where('tahun', $tahun)->groupBy('sow2', 'kat_tower')->get();
         // Mengambil data jumlah tower per sow2 "COLO" berdasarkan kat_tower
@@ -49,9 +53,11 @@ class SalesOrderController extends Controller
         $towerCountsBySowArea = SalesOrder::select('sow2', 'area', \DB::raw('count(*) as total'))->whereIn('sow2', ['COLO'])->whereIn('kat_tower', ['Titan', 'Edelweiss 1A', 'Edelweiss 1B', 'Edelweiss 2', 'Edelweiss 3', 'UNO', 'Akuisisi'])->where('tahun', $tahun)->groupBy('sow2', 'area')->get();
         // Mengambil data jumlah tower per final status site
         $towerCountsByStatus = SalesOrder::select('final_status_site', \DB::raw('count(*) as total'))->where('tahun', $tahun)->groupBy('final_status_site')->get();
-            
-        $geojsonFiles = \File::files(public_path('js/geojson/province'));
+        // Mengambil data progress RFI
+        $towerCountsByStatusRFI = SalesOrder::select('status_xl', 'final_status_site', \DB::raw('count(*) as total'))->where('tahun', $tahun)->where('final_status_site', 'RFI')->groupBy('final_status_site', 'status_xl')->get();
 
+        $geojsonFiles = \File::files(public_path('js/geojson/province'));
+        
         // Menyiapkan array untuk menyimpan data tower colo per kat_tower
         $coloDataByKatTower = [];
 
@@ -100,12 +106,15 @@ class SalesOrderController extends Controller
             'totalTowerCount' => $totalTowerCount,
             'towerCountsByPulau' => $towerCountsByPulau,
             'towerCountsByPulauSow' => $towerCountsByPulauSow,
+            'towerCountsByAreaSow' => $towerCountsByAreaSow,
+            'towerCountsByAreaB2S' => $towerCountsByAreaB2S,
             'towerCountsBySow' => $towerCountsBySow,
             'coloDataByKatTower' => $coloDataByKatTower,
             'coloDataByTenantExisting' => $coloDataByTenantExisting,
             'coloDataByArea' => $coloDataByArea,
             'towerCountsByDemography' => $towerCountsByDemography,
             'towerCountsByStatus' => $towerCountsByStatus,
+            'towerCountsByStatusRFI' => $towerCountsByStatusRFI,
             'salesOrders' => $salesOrders
         ]);
     }

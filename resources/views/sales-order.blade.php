@@ -9,12 +9,15 @@
                     {{ __('Sales Order') }}
                     {{ $tahun }}    
                 </div>
-                <div class="card m-3 map-container">
+                <div class="card m-4 map-container">
                     <div id="map" style="height: 500px;"></div>
                 </div>
                 <div class="row row-cols-1 row-cols-md-2 g-4 px-4 mt-1">
                     <div class="col">
                         <div class="card chart-cd shadow-sm">
+                            <button type="button" id="info-icon1" class="btn btn-light" data-bs-toggle="popover" data-bs-placement="bottom">
+                                <i class="fas fa-info-circle"></i>
+                            </button>
                             <div class="chart-container">
                                 <div id="doughnutHoleText"></div>
                                 <canvas id="doughnutChart" width="400" height="400"></canvas>
@@ -69,32 +72,87 @@
                     </div>
                     <div class="col-md-7">
                         <div class="card chart-cd shadow-sm">
-                            <div class="chart-container">
+                            <div class="chart-container py-4">
+                            <h4 class="progress-title">Progress Site RFI</h4>
+                                <div class="progress-table-container pt-2">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr class="header-content">
+                                                <th>Status Site</th>
+                                                <th class="contain-header">Jumlah</th>
+                                                <th class="contain-header">Detail</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($towerCountsByStatusRFI as $towerCount)
+                                            <tr class="content">
+                                                <td>
+                                                    <div class="category">
+                                                        <div class="progress-bar" style="--progress: {{ ($towerCount->total / $towerCountsByStatusRFI->sum('total')) * 100 }}%;">
+                                                            <span>{{ $towerCount->status_xl }}</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="contain-header vermid">{{ $towerCount->total }}</td>
+                                                <td class="vermid">
+                                                    @if($towerCount->status_xl == 'RFI-NY BAUF')
+                                                        1. Site sudah RFI (status cons) <br> 2. Dokumen BAUF belum muncul di LMS (sistem XL) sehingga tidak bisa dilanjutkan proses create BAPS/BAK
+                                                    @elseif($towerCount->status_xl == 'RFI-BAUF DONE')
+                                                        1. Site sudah RFI (status cons) <br> 2. BAPS/BAK created, menunggu approval dari PMO XL dan LM XL.
+                                                    @elseif($towerCount->status_xl == 'BAK Completed')
+                                                        1. BAPS/BAK approved by PMO XL. <br> 2. BAPS/BAK approved by LM XL.
+                                                    @elseif($towerCount->status_xl == 'Invoice Done')
+                                                        1. Invoice done
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>PID</th>
-                            <th>Site ID</th>
-                            <th>Site Name</th>
-                            <th>Aging</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($salesOrders as $salesOrder)
-                        <tr>
-                            <td>{{ $salesOrder->pid }}</td>
-                            <td>{{ $salesOrder->site_id_tenant }}</td>
-                            <td>{{ $salesOrder->site_name }}</td>
-                            <td>{{ $salesOrder->aging_rfi_to_bak }}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-
+                <div class="card m-4">
+                    <div class="card-header">Aging Order RFI - BAK</div>
+                    <div class="card m-4">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th class="contain-header">PID</th>
+                                    <th class="contain-header">Site ID</th>
+                                    <th class="contain-header">Site Name</th>
+                                    <th class="contain-header">Status Site</th>
+                                    <th class="contain-header">Aging</th>
+                                    <th class="contain-header">Category Aging</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($salesOrders as $salesOrder)
+                                    @if($salesOrder->status_xl == "RFI-NY BAUF" || $salesOrder->status_xl == "RFI-BAUF DONE")
+                                        <tr>
+                                            <td class="contain-header">{{ $salesOrder->pid }}</td>
+                                            <td class="contain-header">{{ $salesOrder->site_id_tenant }}</td>
+                                            <td class="contain-header">{{ $salesOrder->site_name }}</td>
+                                            <td class="contain-header">{{ $salesOrder->status_xl }}</td>
+                                            <td class="contain-header">{{ $salesOrder->aging_rfi_to_bak }} days</td>
+                                            <td class="contain-header">
+                                                @if($salesOrder->aging_rfi_to_bak <= 14)
+                                                    <button class="btn btn-success aging-button">Low Attention</button>
+                                                @elseif($salesOrder->aging_rfi_to_bak >= 15 && $salesOrder->aging_rfi_to_bak <= 30)
+                                                    <button class="btn btn-warning aging-button">Attention</button>
+                                                @elseif($salesOrder->aging_rfi_to_bak >= 31)
+                                                    <button class="btn btn-danger aging-button">Need More Attention</button>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endif
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -288,6 +346,45 @@
                         doughnutHoleText.classList.add('doughnut-hole-text');
                     }
                 }
+            }
+        });
+
+        const popover1 = new bootstrap.Popover(document.getElementById('info-icon1'), {
+            container: 'body',
+            html: true,
+            content: function () {
+                // Mengambil data tower berdasarkan area dan sow2
+                var coloData = @json($towerCountsByAreaSow);
+                var b2sData = @json($towerCountsByAreaB2S);
+
+                var content = '';
+                if (coloData.length > 0) {
+                    content += '<b>COLO Based on Area</b> <br>'
+
+                    // Menambahkan informasi area dan total ke konten popover
+                    coloData.forEach(function (data) {
+                        var area = data.area;
+                        var total = data.total;
+
+                        content += area ;
+                        content += ' : ' + total + ' site <br>';
+                    });
+                }
+
+                if (b2sData.length > 0) {
+                    content += '<br>'
+                    content += '<b>B2S Based on Area</b> <br>'
+
+                    b2sData.forEach(function (data) {
+                        var area = data.area;
+                        var total = data.total;
+
+                        content += area ;
+                        content += ' : ' + total + ' site <br>';
+                    });
+                }
+
+                return content;
             }
         });
 //chart kat_tower
@@ -651,7 +748,7 @@
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Status Site Order XL {{ $tahun }}',
+                        text: 'General Status Site Order XL {{ $tahun }}',
                         font: {
                             size: 16
                         }
@@ -756,6 +853,12 @@
             right: 10px;
         }
 
+        #info-icon1 {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
         .popover-body {
             font-size: 14px; /* Ganti dengan ukuran font yang diinginkan */
         }
@@ -769,4 +872,57 @@
             --bs-popover-max-width: 100px;
         }
 
+        .contain-header {
+            text-align: center;
+        }
+
+        .aging-button {
+            pointer-events: none;
+        }
+
+        .category {
+        display: flex;
+        align-items: center;
+        }
+
+        .progress-bar {
+        position: relative;
+        height: 50px;
+        background-color: #ccc;
+        }
+
+        .progress-bar::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: var(--progress);
+        background-color: #ccc;
+        transition: width 0.3s ease-in-out;
+        }
+
+        .category span {
+        position: relative;
+        z-index: 1;
+        padding-left: 10px;
+        }
+
+        .progress-title {
+            font-weight: bold;
+            font-size: 17px;
+            margin-bottom: 10px;
+        }
+
+        .vermid {
+            vertical-align: middle;
+        }
+
+        .content {
+            font-size: 14px;
+        }
+
+        .header-content {
+            font-size: 15px;
+        }
     </style>

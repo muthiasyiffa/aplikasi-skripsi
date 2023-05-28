@@ -35,7 +35,17 @@ class SalesOperatorImport implements ToModel, WithHeadingRow, WithMultipleSheets
         $tenantExisting = ($row['Tenant Existing'] === $nullValue || $row['Tenant Existing'] == null) ? null : $row['Tenant Existing'];
         $statusXL = ($row['Status XL'] === $nullValue || $row['Status XL'] == null) ? null : $row['Status XL'];
         $katTower = ($row['KATEGORI TOWER'] === $nullValue || $row['KATEGORI TOWER'] == null) ? null : $row['KATEGORI TOWER'];
-        $rfiDate = ($row['RFI DATE'] === $nullValue || $row['RFI DATE'] == null) ? null : \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['RFI DATE'])->format('Y-m-d');
+        $rfiDate = null;
+        if (is_numeric($row['RFI DATE'])) {
+            $rfiDate = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['RFI DATE'])->format('Y-m-d');
+        } else if (is_string($row['RFI DATE'])) {
+            $dateTime = \DateTime::createFromFormat('d/m/Y', $row['RFI DATE']);
+            if ($dateTime !== false) {
+                $rfiDate = $dateTime->format('Y-m-d');
+            } else {
+                echo "Invalid date format";
+            }
+        }
 
         $data = [
             'tahun' => $this->year,
@@ -69,6 +79,10 @@ class SalesOperatorImport implements ToModel, WithHeadingRow, WithMultipleSheets
                     $data['final_status_site'] = 'On Going';
                     break;
                 case 'ESR Created':
+                    $data['status_xl'] = 'On Going';
+                    $data['final_status_site'] = 'On Going';
+                    break;
+                case 'ESR Ready':
                     $data['status_xl'] = 'On Going';
                     $data['final_status_site'] = 'On Going';
                     break;
