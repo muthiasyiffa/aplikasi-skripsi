@@ -55,6 +55,8 @@ class SalesOrderController extends Controller
         $towerCountsByStatus = SalesOrder::select('final_status_site', \DB::raw('count(*) as total'))->where('tahun', $tahun)->groupBy('final_status_site')->get();
         // Mengambil data progress RFI
         $towerCountsByStatusRFI = SalesOrder::select('status_xl', 'final_status_site', \DB::raw('count(*) as total'))->where('tahun', $tahun)->where('final_status_site', 'RFI')->groupBy('final_status_site', 'status_xl')->get();
+        // Mengambil data jumlah tower per statusXL
+        $towerCountsByStatusXL = SalesOrder::select('status_xl', \DB::raw('count(*) as total'))->where('tahun', $tahun)->groupBy('status_xl')->get();
 
         $geojsonFiles = \File::files(public_path('js/geojson/province'));
         
@@ -100,6 +102,28 @@ class SalesOrderController extends Controller
             }
         }
 
+        // Menghitung total tower COLO
+        $coloTotal = array_reduce(array_values($coloDataByKatTower), function ($total, $count) {
+            return $total + $count;
+        }, 0);
+
+        // Mengkategorikan tower sebagai Tower Akuisisi atau Tower B2S Mitratel
+        $akuisisiTowers = ['Titan', 'Edelweiss 1A', 'Edelweiss 1B', 'Edelweiss 2', 'Edelweiss 3', 'UNO', 'Akuisisi'];
+
+        $akuisisiData = [];
+
+        // Memisahkan data tower berdasarkan kategori
+        foreach ($coloDataByKatTower as $katTower => $count) {
+            if (in_array($katTower, $akuisisiTowers)) {
+                $akuisisiData[$katTower] = $count;
+            }
+        }
+
+        // Menghitung total tower akuisisi
+        $akuisisiTotal = array_reduce(array_values($akuisisiData), function ($total, $count) {
+            return $total + $count;
+        }, 0);
+
         return view('sales-order', [
             'tahun' => $tahun,
             'geojsonFiles' => $geojsonFiles,
@@ -110,11 +134,14 @@ class SalesOrderController extends Controller
             'towerCountsByAreaB2S' => $towerCountsByAreaB2S,
             'towerCountsBySow' => $towerCountsBySow,
             'coloDataByKatTower' => $coloDataByKatTower,
+            'coloTotal' => $coloTotal,
+            'akuisisiTotal' => $akuisisiTotal,
             'coloDataByTenantExisting' => $coloDataByTenantExisting,
             'coloDataByArea' => $coloDataByArea,
             'towerCountsByDemography' => $towerCountsByDemography,
             'towerCountsByStatus' => $towerCountsByStatus,
             'towerCountsByStatusRFI' => $towerCountsByStatusRFI,
+            'towerCountsByStatusXL' => $towerCountsByStatusXL,
             'salesOrders' => $salesOrders
         ]);
     }

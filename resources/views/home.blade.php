@@ -6,7 +6,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">{{ __('Dashboard') }}</div>
-                <div class="card m-3 map-container">
+                <div class="card m-4 map-container">
                     <div id="map" style="height: 500px;"></div>
                 </div>
                 <div class="row row-cols-1 row-cols-md-2 g-4 px-4">
@@ -103,7 +103,7 @@
                                     }
                                 @endforeach
 
-                                layer.bindTooltip(tooltipContent);
+                                layer.bindTooltip(tooltipContent, { permanent: true, direction: 'top' }).openTooltip();
                             }
                         }).addTo(map);
                     }),
@@ -202,7 +202,7 @@
                                 return [];
                             }
                         }
-                    }
+                    },
                 },
                 animation: {
                     onComplete: function() {
@@ -216,6 +216,30 @@
                         doughnutHoleText.style.left = centerX + 'px';
                         doughnutHoleText.innerHTML = towerCount + '<br>Site';
                         doughnutHoleText.classList.add('doughnut-hole-text');
+                    },
+                    onProgress: function(animation) {
+                        var chartInstance = animation.chart;
+                        var ctx = chartInstance.ctx;
+                        ctx.font = Chart.helpers.fontString(Chart.defaults.font.size, 'bold', Chart.defaults.font.family);
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+
+                        this.data.datasets.forEach(function(dataset, i) {
+                            var meta = chartInstance.getDatasetMeta(i);
+                            meta.data.forEach(function(element, index) {
+                                var data = dataset.data[index] + ' Site';
+                                var startAngle = element.startAngle;
+                                var endAngle = element.endAngle;
+                                var angle = startAngle + (endAngle - startAngle) / 2;
+
+                                var radius = element.outerRadius * 0.7; // Sesuaikan jarak teks dari pusat
+
+                                var x = element.x + Math.cos(angle) * radius;
+                                var y = element.y + Math.sin(angle) * radius;
+
+                                ctx.fillText(data, x, y);
+                            });
+                        });
                     }
                 }
             }
@@ -235,7 +259,6 @@
             data: {
                 labels: areas,
                 datasets: [{
-                    label: 'Tower COLO',
                     data: coloCounts,
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.2)',
@@ -267,6 +290,9 @@
                     },
                     legend: {
                         display: false
+                    },
+                    tooltip: {
+                        enable: false
                     }
                 },
                 scales: {
@@ -282,7 +308,33 @@
                     }
                 },
                 responsive: true,
-                maintainAspectRatio: false
+                maintainAspectRatio: false,
+                animation: {
+                    onProgress: function(animation) {
+                        var chartInstance = animation.chart;
+                        var ctx = chartInstance.ctx;
+                        ctx.font = Chart.helpers.fontString(Chart.defaults.font.size, 'bold', Chart.defaults.font.family);
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'bottom';
+
+                        this.data.datasets.forEach(function(dataset, i) {
+                            var meta = chartInstance.getDatasetMeta(i);
+                            meta.data.forEach(function(bar, index) {
+                                var data = dataset.data[index];
+                                var xPos = bar.x;
+                                var yPos = bar.y - 5;
+                                ctx.fillText(data, xPos, yPos);
+
+                                var total = coloCounts.reduce((total, count) => total + count, 0);
+
+                                var percent = ((data / total) * 100).toFixed(0) + '%';
+                                var percentXPos = bar.x;
+                                var percentYPos = bar.y + 20;
+                                ctx.fillText(percent, percentXPos, percentYPos);
+                            });
+                        });
+                    }
+                }
             }
         });
 

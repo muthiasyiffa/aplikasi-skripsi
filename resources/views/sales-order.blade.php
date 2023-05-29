@@ -13,18 +13,55 @@
                     <div id="map" style="height: 500px;"></div>
                 </div>
                 <div class="row row-cols-1 row-cols-md-2 g-4 px-4 mt-1">
-                    <div class="col">
-                        <div class="card chart-cd shadow-sm">
-                            <button type="button" id="info-icon1" class="btn btn-light" data-bs-toggle="popover" data-bs-placement="bottom">
-                                <i class="fas fa-info-circle"></i>
-                            </button>
+                    <div class="col-md-5">
+                        <div class="card chart-cd shadow-sm pb-4">
                             <div class="chart-container">
                                 <div id="doughnutHoleText"></div>
                                 <canvas id="doughnutChart" width="400" height="400"></canvas>
                             </div>
+                            <div class="table-container mb-2">
+                                <div class="card ms-4 me-2 card-tab">
+                                    <div class="card-header sub">B2S Based on Area</div>
+                                    <table class="table table-bordered px-2">
+                                        <thead>
+                                            <tr class="header-content">
+                                                <th class="contain-header">Area</th>
+                                                <th class="contain-header">Jumlah site</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($towerCountsByAreaB2S as $towerCount)
+                                            <tr class="content">
+                                                <td class="contain-header vermid">{{ $towerCount->area }} </td>
+                                                <td class="contain-header vermid">{{ $towerCount->total }}</td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="card ms-2 me-4 card-tab">
+                                    <div class="card-header sub">COLO Based on Area</div>
+                                    <table class="table table-bordered px-2">
+                                        <thead>
+                                            <tr class="header-content">
+                                                <th class="contain-header">Area</th>
+                                                <th class="contain-header">Jumlah site</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($towerCountsByAreaSow as $towerCount)
+                                            <tr class="content">
+                                                <td class="contain-header vermid">{{ $towerCount->area }} </td>
+                                                <td class="contain-header vermid">{{ $towerCount->total }}</td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col-md-7">
                         <div class="card chart-cd shadow-sm">
                             <button type="button" id="info-icon" class="btn btn-light" data-bs-toggle="popover" data-bs-placement="bottom">
                                 <i class="fas fa-info-circle"></i>
@@ -32,18 +69,18 @@
                             <div class="chart-container">
                                 <canvas id="coloChart"></canvas>
                             </div>
+                            <div class="card mx-3 mb-3">
+                                <div class="card-body">
+                                <h5 class="progress-title">Key Insight</h5>
+                                <p class="card-text">Dari total tower colo sebanyak <b>{{ $coloTotal }} Site.</b> terdapat kategori tower Bangun Mandiri atau biasa disebut B2S dan kategori tower Telkom Group. Kedua kategori tersebut <b>bukan</b> merupakan site akuisisi.</p>
+                                <p class="card-text"><b>Total Site Akuisisi : {{ $akuisisiTotal }} Site </b></p>
+                                <p class="card-text"><b>Titan :</b> Site akuisisi dari <b>ISAT</b><br> <b>Edelweiss 1A, 1B, 2, dan 3 :</b> Site akuisisi dari <b>TSEL</b><br><b>UNO :</b> Site akuisisi dari <b>Telkom</b><br> <b>Akuisisi :</b> Site akuisisi dari <b>perusahaan kecil</b><br></p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="row row-cols-1 row-cols-md-3 g-4 px-4 mt-1">
-                    <div class="col">
-                        <div class="card chart-cd shadow-sm">
-                            <div class="chart-container">
-                                <canvas id="doughnutChart1" width="400" height="400"></canvas>
-                                <div id="doughnutHoleText1"></div>
-                            </div>
-                        </div>
-                    </div>
                     <div class="col">
                         <div class="card chart-cd shadow-sm">
                             <div class="chart-container">
@@ -55,6 +92,13 @@
                     <div class="col">
                         <div class="card chart-cd shadow-sm">
                             <div class="chart-container">
+                                <canvas id="tenantChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card chart-cd shadow-sm">
+                            <div class="chart-container pb-6">
                                 <canvas id="doughnutChart3" width="400" height="400"></canvas>
                                 <div id="doughnutHoleText3"></div>
                             </div>
@@ -79,7 +123,8 @@
                                         <thead>
                                             <tr class="header-content">
                                                 <th>Status Site</th>
-                                                <th class="contain-header">Jumlah</th>
+                                                <th class="contain-header">Percentage</th>
+                                                <th class="contain-header">Total</th>
                                                 <th class="contain-header">Detail</th>
                                             </tr>
                                         </thead>
@@ -93,6 +138,7 @@
                                                         </div>
                                                     </div>
                                                 </td>
+                                                <td class="contain-header vermid">{{ intVal(($towerCount->total / $towerCountsByStatusRFI->sum('total')) * 100) }}%</td>
                                                 <td class="contain-header vermid">{{ $towerCount->total }}</td>
                                                 <td class="vermid">
                                                     @if($towerCount->status_xl == 'RFI-NY BAUF')
@@ -231,7 +277,7 @@
                                     }
                                 @endforeach
 
-                                layer.bindTooltip(tooltipContent);
+                                layer.bindTooltip(tooltipContent, { permanent: true, direction: 'top' }).openTooltip();
                             }
                         }).addTo(map);
                     }),
@@ -344,47 +390,32 @@
                         doughnutHoleText.style.left = centerX + 'px';
                         doughnutHoleText.innerHTML = towerCount + '<br>Site';
                         doughnutHoleText.classList.add('doughnut-hole-text');
+                    },
+                    onProgress: function(animation) {
+                        var chartInstance = animation.chart;
+                        var ctx = chartInstance.ctx;
+                        ctx.font = Chart.helpers.fontString(Chart.defaults.font.size, 'bold', Chart.defaults.font.family);
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+
+                        this.data.datasets.forEach(function(dataset, i) {
+                            var meta = chartInstance.getDatasetMeta(i);
+                            meta.data.forEach(function(element, index) {
+                                var data = dataset.data[index];
+                                var startAngle = element.startAngle;
+                                var endAngle = element.endAngle;
+                                var angle = startAngle + (endAngle - startAngle) / 2;
+
+                                var radius = element.outerRadius * 0.75; // Sesuaikan jarak teks dari pusat
+
+                                var x = element.x + Math.cos(angle) * radius;
+                                var y = element.y + Math.sin(angle) * radius;
+
+                                ctx.fillText(data, x, y);
+                            });
+                        });
                     }
                 }
-            }
-        });
-
-        const popover1 = new bootstrap.Popover(document.getElementById('info-icon1'), {
-            container: 'body',
-            html: true,
-            content: function () {
-                // Mengambil data tower berdasarkan area dan sow2
-                var coloData = @json($towerCountsByAreaSow);
-                var b2sData = @json($towerCountsByAreaB2S);
-
-                var content = '';
-                if (coloData.length > 0) {
-                    content += '<b>COLO Based on Area</b> <br>'
-
-                    // Menambahkan informasi area dan total ke konten popover
-                    coloData.forEach(function (data) {
-                        var area = data.area;
-                        var total = data.total;
-
-                        content += area ;
-                        content += ' : ' + total + ' site <br>';
-                    });
-                }
-
-                if (b2sData.length > 0) {
-                    content += '<br>'
-                    content += '<b>B2S Based on Area</b> <br>'
-
-                    b2sData.forEach(function (data) {
-                        var area = data.area;
-                        var total = data.total;
-
-                        content += area ;
-                        content += ' : ' + total + ' site <br>';
-                    });
-                }
-
-                return content;
             }
         });
 //chart kat_tower
@@ -402,7 +433,6 @@
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Tower COLO',
                     data: coloCounts,
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.2)',
@@ -434,6 +464,9 @@
                     },
                     legend: {
                         display: false
+                    },
+                    tooltip: {
+                        enabled: false
                     }
                 },
                 scales: {
@@ -449,7 +482,33 @@
                     }
                 },
                 responsive: true,
-                maintainAspectRatio: false
+                maintainAspectRatio: false,
+                animation: {
+                    onProgress: function(animation) {
+                        var chartInstance = animation.chart;
+                        var ctx = chartInstance.ctx;
+                        ctx.font = Chart.helpers.fontString(Chart.defaults.font.size, 'bold', Chart.defaults.font.family);
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'bottom';
+
+                        this.data.datasets.forEach(function(dataset, i) {
+                            var meta = chartInstance.getDatasetMeta(i);
+                            meta.data.forEach(function(bar, index) {
+                                var data = dataset.data[index];
+                                var xPos = bar.x;
+                                var yPos = bar.y - 5;
+                                ctx.fillText(data, xPos, yPos);
+
+                                var total = coloCounts.reduce((total, count) => total + count, 0);
+
+                                var percent = ((data / total) * 100).toFixed(0) + '%';
+                                var percentXPos = bar.x;
+                                var percentYPos = bar.y + 15;
+                                ctx.fillText(percent, percentXPos, percentYPos);
+                            });
+                        });
+                    }
+                }
             }
         });
 
@@ -495,73 +554,96 @@
         var coloDataByTenantExisting = {!! json_encode($coloDataByTenantExisting) !!};
 
         // Membuat array untuk label tenant dan data jumlah tower colo
-        var labelsTenant = Object.keys(coloDataByTenantExisting);
+        var labelsTenant = Object.keys(coloDataByTenantExisting).map(function(label) {
+            if (label === '') {
+                return 'NPA';
+            } else {
+                return 'Bertenant ' + label;
+            }
+        });
         var coloCountsbyTenant = Object.values(coloDataByTenantExisting);
-        var totalColo = Object.values(coloDataByTenantExisting).reduce((total, count) => total + count, 0);
 
-        // Membuat doughnut chart tenant_existing
-        var doughnutChart1 = new Chart(document.getElementById('doughnutChart1'), {
-            type: 'doughnut',
+        // Membuat bar chart
+        var ctx = document.getElementById('tenantChart').getContext('2d');
+        var tenantChart = new Chart(ctx, {
+            type: 'bar',
             data: {
                 labels: labelsTenant,
                 datasets: [{
                     data: coloCountsbyTenant,
                     backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(255, 205, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                    ],
+                    borderColor: [
                         'rgb(255, 99, 132)',
-                        'rgb(75, 192, 192)',
+                        'rgb(255, 159, 64)',
                         'rgb(255, 205, 86)',
-                        'rgb(201, 203, 207)',
-                        'rgb(54, 162, 235)'
+                        'rgb(75, 192, 192)',
                     ],
                     borderWidth: 1
                 }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Collocation Based Site Condition',
+                        text: 'Collocation cut off {{ $tahun - 1 }} Based Site Condition',
+                        padding: {
+                            top: 10,
+                            bottom: 30
+                        },
                         font: {
                             size: 16
                         }
                     },
                     legend: {
-                        position: 'bottom',
-                        labels: {
-                            generateLabels: function(chart) {
-                                var data = chart.data;
-                                if (data.labels.length && data.datasets.length) {
-                                    return data.labels.map(function(label, i) {
-                                        var meta = chart.getDatasetMeta(0);
-                                        var dataItem = data.datasets[0].data[i];
-                                        var total = meta.total;
-                                        var percentage = ((dataItem / total) * 100).toFixed(0);
-                                        return {
-                                            text: label + ' (' + percentage + '%)',
-                                            fillStyle: data.datasets[0].backgroundColor[i],
-                                            hidden: isNaN(dataItem) || meta.data[i].hidden,
-                                            index: i
-                                        };
-                                    });
-                                }
-                                return [];
-                            }
-                        }
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: false
                     }
                 },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false,
+                        },
+                    },
+                    y: {
+                        beginAtZero: true,
+                        precision: 0,
+                        stepSize: 1
+                    }
+                },
+                responsive: true,
+                maintainAspectRatio: false,
                 animation: {
-                    onComplete: function() {
-                        var doughnutHoleText1 = document.getElementById('doughnutHoleText1');
-                        var chartArea1 = doughnutChart1.chartArea;
-                        var centerX1 = (chartArea1.left + chartArea1.right) / 1.95;
-                        var centerY1 = (chartArea1.top + chartArea1.bottom) / 2.5;
+                    onProgress: function(animation) {
+                        var chartInstance = animation.chart;
+                        var ctx = chartInstance.ctx;
+                        ctx.font = Chart.helpers.fontString(Chart.defaults.font.size, 'bold', Chart.defaults.font.family);
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'bottom';
 
-                        doughnutHoleText1.style.top = centerY1 + 'px';
-                        doughnutHoleText1.style.left = centerX1 + 'px';
-                        doughnutHoleText1.innerHTML = totalColo + '<br>Site';
-                        doughnutHoleText1.classList.add('doughnut-hole-text');
+                        this.data.datasets.forEach(function(dataset, i) {
+                            var meta = chartInstance.getDatasetMeta(i);
+                            meta.data.forEach(function(bar, index) {
+                                var data = dataset.data[index];
+                                var xPos = bar.x;
+                                var yPos = bar.y - 5;
+                                ctx.fillText(data, xPos, yPos);
+
+                                var total = coloCountsbyTenant.reduce((total, count) => total + count, 0);
+
+                                var percent = ((data / total) * 100).toFixed(0) + '%';
+                                var percentXPos = bar.x;
+                                var percentYPos = bar.y + 15;
+                                ctx.fillText(percent, percentXPos, percentYPos);
+                            });
+                        });
                     }
                 }
             }
@@ -597,7 +679,7 @@
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Collocation Based Site Acquisition',
+                        text: 'Collocation cut off {{ $tahun - 1 }} Based Site Acquisition',
                         font: {
                             size: 16
                         }
@@ -637,6 +719,30 @@
                         doughnutHoleText2.style.left = centerX2 + 'px';
                         doughnutHoleText2.innerHTML = totalColoArea + '<br>Site';
                         doughnutHoleText2.classList.add('doughnut-hole-text');
+                    },
+                    onProgress: function(animation) {
+                        var chartInstance = animation.chart;
+                        var ctx = chartInstance.ctx;
+                        ctx.font = Chart.helpers.fontString(Chart.defaults.font.size, 'bold', Chart.defaults.font.family);
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+
+                        this.data.datasets.forEach(function(dataset, i) {
+                            var meta = chartInstance.getDatasetMeta(i);
+                            meta.data.forEach(function(element, index) {
+                                var data = dataset.data[index];
+                                var startAngle = element.startAngle;
+                                var endAngle = element.endAngle;
+                                var angle = startAngle + (endAngle - startAngle) / 2;
+
+                                var radius = element.outerRadius * 0.75; // Sesuaikan jarak teks dari pusat
+
+                                var x = element.x + Math.cos(angle) * radius;
+                                var y = element.y + Math.sin(angle) * radius;
+
+                                ctx.fillText(data, x, y);
+                            });
+                        });
                     }
                 }
             }
@@ -713,6 +819,30 @@
                         doughnutHoleText3.style.left = centerX3 + 'px';
                         doughnutHoleText3.innerHTML = towerCount + '<br>Site';
                         doughnutHoleText3.classList.add('doughnut-hole-text');
+                    },
+                    onProgress: function(animation) {
+                        var chartInstance = animation.chart;
+                        var ctx = chartInstance.ctx;
+                        ctx.font = Chart.helpers.fontString(Chart.defaults.font.size, 'bold', Chart.defaults.font.family);
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+
+                        this.data.datasets.forEach(function(dataset, i) {
+                            var meta = chartInstance.getDatasetMeta(i);
+                            meta.data.forEach(function(element, index) {
+                                var data = dataset.data[index];
+                                var startAngle = element.startAngle;
+                                var endAngle = element.endAngle;
+                                var angle = startAngle + (endAngle - startAngle) / 2;
+
+                                var radius = element.outerRadius * 0.75; // Sesuaikan jarak teks dari pusat
+
+                                var x = element.x + Math.cos(angle) * radius;
+                                var y = element.y + Math.sin(angle) * radius;
+
+                                ctx.fillText(data, x, y);
+                            });
+                        });
                     }
                 }
             }
@@ -789,6 +919,30 @@
                         doughnutHoleText4.style.left = centerX4 + 'px';
                         doughnutHoleText4.innerHTML = towerCount + '<br>Site';
                         doughnutHoleText4.classList.add('doughnut-hole-text');
+                    },
+                    onProgress: function(animation) {
+                        var chartInstance = animation.chart;
+                        var ctx = chartInstance.ctx;
+                        ctx.font = Chart.helpers.fontString(Chart.defaults.font.size, 'bold', Chart.defaults.font.family);
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+
+                        this.data.datasets.forEach(function(dataset, i) {
+                            var meta = chartInstance.getDatasetMeta(i);
+                            meta.data.forEach(function(element, index) {
+                                var data = dataset.data[index];
+                                var startAngle = element.startAngle;
+                                var endAngle = element.endAngle;
+                                var angle = startAngle + (endAngle - startAngle) / 2;
+
+                                var radius = element.outerRadius * 0.75; // Sesuaikan jarak teks dari pusat
+
+                                var x = element.x + Math.cos(angle) * radius;
+                                var y = element.y + Math.sin(angle) * radius;
+
+                                ctx.fillText(data, x, y);
+                            });
+                        });
                     }
                 }
             }
@@ -924,5 +1078,21 @@
 
         .header-content {
             font-size: 15px;
+        }
+
+        .sub {
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .card-tab {
+            display: inline-block;
+            vertical-align: top;
+            width: 50%;
+        }
+
+        .table-container {
+            display: flex;
+            justify-content: space-between;
         }
     </style>
