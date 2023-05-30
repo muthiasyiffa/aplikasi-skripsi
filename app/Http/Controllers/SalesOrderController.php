@@ -25,15 +25,18 @@ class SalesOrderController extends Controller
         $totalTowerCount = $salesOrders->count();
 
         foreach ($salesOrders as $salesOrder) {
+            $statusXL = $salesOrder->status_xl;
             $rfiDate = $salesOrder->rfi_date;
-            if ($rfiDate) {
-                if ($rfiDate == '1970-01-01') {
-                    $salesOrder->aging_rfi_to_bak = 'Not yet RFI';
-                } else {
-                    $aging = \Carbon\Carbon::parse($rfiDate)->diffInDays($currentDate);
-                    $salesOrder->aging_rfi_to_bak = (string) $aging;
+            if($statusXL === "RFI-NY BAUF" || $statusXL === "RFI-BAUF DONE") {
+                if ($rfiDate) {
+                    if ($rfiDate == '1970-01-01') {
+                        $salesOrder->aging_rfi_to_bak = 'Not yet RFI';
+                    } else {
+                        $aging = \Carbon\Carbon::parse($rfiDate)->diffInDays($currentDate);
+                        $salesOrder->aging_rfi_to_bak = (string) $aging;
+                    }
+                    $salesOrder->save();
                 }
-                $salesOrder->save();
             }
         }
 
