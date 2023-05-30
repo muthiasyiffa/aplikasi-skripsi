@@ -162,41 +162,83 @@
                 </div>
                 <div class="card m-4">
                     <div class="card-header">Aging Order RFI - BAK</div>
+                    <div class= "filter">
+                        <label for="filterCategory">Filter Data Aging</label>
+                        <select id="filterCategory">
+                            <option value="all">All Categories</option>
+                            <option value="Low Attention">Low Attention</option>
+                            <option value="Attention">Attention</option>
+                            <option value="Need More Attention">Need More Attention</option>
+                        </select>
+                        <select id="filterStatus">
+                            <option value="all">All Status</option>
+                            <option value="RFI-NY BAUF">RFI-NY BAUF</option>
+                            <option value="RFI-BAUF DONE">RFI-BAUF DONE</option>
+                        </select>
+                    </div>
                     <div class="card m-4">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th class="contain-header">PID</th>
-                                    <th class="contain-header">Site ID</th>
-                                    <th class="contain-header">Site Name</th>
-                                    <th class="contain-header">Status Site</th>
-                                    <th class="contain-header">Aging</th>
-                                    <th class="contain-header">Category Aging</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($salesOrders as $salesOrder)
-                                    @if($salesOrder->status_xl == "RFI-NY BAUF" || $salesOrder->status_xl == "RFI-BAUF DONE")
-                                        <tr>
-                                            <td class="contain-header">{{ $salesOrder->pid }}</td>
-                                            <td class="contain-header">{{ $salesOrder->site_id_tenant }}</td>
-                                            <td class="contain-header">{{ $salesOrder->site_name }}</td>
-                                            <td class="contain-header">{{ $salesOrder->status_xl }}</td>
-                                            <td class="contain-header">{{ $salesOrder->aging_rfi_to_bak }} days</td>
-                                            <td class="contain-header">
-                                                @if($salesOrder->aging_rfi_to_bak <= 14)
-                                                    <button class="btn btn-success aging-button">Low Attention</button>
-                                                @elseif($salesOrder->aging_rfi_to_bak >= 15 && $salesOrder->aging_rfi_to_bak <= 30)
-                                                    <button class="btn btn-warning aging-button">Attention</button>
-                                                @elseif($salesOrder->aging_rfi_to_bak >= 31)
-                                                    <button class="btn btn-danger aging-button">Need More Attention</button>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                    @endif
-                                @endforeach
-                            </tbody>
-                        </table>
+                        <div class="table-container">
+                            <table id="salesTable" class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th class="contain-header">No.</th>
+                                        <th class="contain-header">PID</th>
+                                        <th class="contain-header">Site ID</th>
+                                        <th class="contain-header">Site Name</th>
+                                        <th class="contain-header">Status Site</th>
+                                        <th class="contain-header">Aging</th>
+                                        <th class="contain-header">Category Aging</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php
+                                        $counter = 1;
+                                    @endphp
+                                    @foreach($salesOrders as $salesOrder)
+                                        @if($salesOrder->status_xl == "RFI-NY BAUF" || $salesOrder->status_xl == "RFI-BAUF DONE")
+                                            <tr>
+                                                <td class="contain-header">{{ $counter++ }}</td>
+                                                <td class="contain-header">{{ $salesOrder->pid }}</td>
+                                                <td class="contain-header">{{ $salesOrder->site_id_tenant }}</td>
+                                                <td class="contain-header">{{ $salesOrder->site_name }}</td>
+                                                <td class="contain-header">{{ $salesOrder->status_xl }}</td>
+                                                <td class="contain-header">
+                                                    @if ($salesOrder->aging_rfi_to_bak === 'Not yet RFI')
+                                                        {{ $salesOrder->aging_rfi_to_bak }}
+                                                    @else
+                                                        {{ $salesOrder->aging_rfi_to_bak }} days
+                                                    @endif
+                                                </td>
+                                                <td class="contain-header">
+                                                    @if($salesOrder->aging_rfi_to_bak <= 14)
+                                                        <button class="btn btn-success aging-button">Low Attention</button>
+                                                    @elseif($salesOrder->aging_rfi_to_bak >= 15 && $salesOrder->aging_rfi_to_bak <= 24)
+                                                        <button class="btn btn-warning aging-button">Attention</button>
+                                                    @elseif($salesOrder->aging_rfi_to_bak >= 25)
+                                                        <button class="btn btn-danger aging-button">Need More Attention</button>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endif
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="legend-container">
+                        <label>Legend:</label>
+                        <div class="legend-item">
+                            <button class="btn btn-success aging-button btn-sm">Low Attention</button>
+                            <span>0 - 14 days</span>
+                        </div>
+                        <div class="legend-item">
+                            <button class="btn btn-warning aging-button btn-sm">Attention</button>
+                            <span>15 - 24 days</span>
+                        </div>
+                        <div class="legend-item">
+                            <button class="btn btn-danger aging-button btn-sm">Need More Attention</button>
+                            <span> < 25 days</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -209,6 +251,61 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.css" />
 
 <script>
+
+    $(document).ready(function() {
+        function updateNumbering() {
+            $("#salesTable tbody tr:visible").each(function(index) {
+                $(this).find(".contain-header:first").text(index + 1);
+            });
+        }
+
+        function applyFilterAndSort() {
+            var selectedCategory = $("#filterCategory").val();
+            var selectedStatus = $("#filterStatus").val();
+            $("#salesTable tbody tr").hide();
+
+            $("#salesTable tbody tr").each(function() {
+                var category = $(this).find(".contain-header button").text();
+                var status = $(this).find(".contain-header:nth-child(5)").text();
+                var aging = $(this).find(".contain-header:nth-child(6)").text().trim();
+
+                var showRow = (selectedCategory === "all" || category === selectedCategory) &&
+                    (selectedStatus === "all" || status === selectedStatus);
+
+                if (showRow) {
+                    $(this).show();
+                }
+            });
+
+            var rows = $("#salesTable tbody tr:visible").get();
+            rows.sort(function(a, b) {
+                var aValue = $(a).find(".contain-header:nth-child(6)").text().trim();
+                var bValue = $(b).find(".contain-header:nth-child(6)").text().trim();
+
+                if (aValue === "Not yet RFI") {
+                    return -1; // Pindahkan a ke atas
+                } else if (bValue === "Not yet RFI") {
+                    return 1; // Pindahkan b ke atas
+                } else {
+                    var aAging = parseInt(aValue.replace(' days', ''));
+                    var bAging = parseInt(bValue.replace(' days', ''));
+                    return aAging - bAging;
+                }
+            });
+
+            $.each(rows, function(index, row) {
+                $("#salesTable tbody").append(row);
+            });
+
+            updateNumbering();
+        }
+
+        $("#filterCategory, #filterStatus").on("change", function() {
+            applyFilterAndSort();
+        });
+
+        applyFilterAndSort();
+    });
 
     document.addEventListener('DOMContentLoaded', function () {
 //data maps sebaran tower
@@ -1094,5 +1191,47 @@
         .table-container {
             display: flex;
             justify-content: space-between;
+            max-height: 700px;
+            overflow: auto;
+        }
+
+        .table-container thead {
+            position: sticky;
+            top: 0;
+            background-color: white;
+        }
+
+        .filter {
+            align-items: center;
+            padding-left: 29px;
+            padding-top: 30px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+        
+        .filter label {
+            margin-right: 10px;
+        }
+
+        .legend-container {
+            display: flex;
+            align-items: center;
+            padding-left: 29px;
+            padding-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .legend-container label {
+            font-size: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+        }
+
+        .legend-item button {
+            margin-right: 5px;
         }
     </style>

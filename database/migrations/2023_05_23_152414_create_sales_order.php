@@ -28,7 +28,7 @@ return new class extends Migration
             $table->string('status_lms')->length(255);
             $table->date('rfi_date')->nullable();
             $table->enum('final_status_site', ['RFI', 'On Going', 'DROP'])->nullable()->length(255);
-            $table->integer('aging_rfi_to_bak')->nullable();
+            $table->string('aging_rfi_to_bak')->nullable();
             $table->timestamps();
         });
     }

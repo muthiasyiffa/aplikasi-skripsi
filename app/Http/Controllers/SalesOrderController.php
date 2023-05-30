@@ -27,8 +27,12 @@ class SalesOrderController extends Controller
         foreach ($salesOrders as $salesOrder) {
             $rfiDate = $salesOrder->rfi_date;
             if ($rfiDate) {
-                $aging = \Carbon\Carbon::parse($rfiDate)->diffInDays($currentDate);
-                $salesOrder->aging_rfi_to_bak = $aging;
+                if ($rfiDate == '1970-01-01') {
+                    $salesOrder->aging_rfi_to_bak = 'Not yet RFI';
+                } else {
+                    $aging = \Carbon\Carbon::parse($rfiDate)->diffInDays($currentDate);
+                    $salesOrder->aging_rfi_to_bak = (string) $aging;
+                }
                 $salesOrder->save();
             }
         }
