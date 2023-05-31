@@ -35,6 +35,30 @@ class SalesOperatorImport implements ToModel, WithHeadingRow, WithMultipleSheets
         $tenantExisting = ($row['Tenant Existing'] === $nullValue || $row['Tenant Existing'] == null) ? null : $row['Tenant Existing'];
         $statusXL = ($row['Status XL'] === $nullValue || $row['Status XL'] == null) ? null : $row['Status XL'];
         $katTower = ($row['KATEGORI TOWER'] === $nullValue || $row['KATEGORI TOWER'] == null) ? null : $row['KATEGORI TOWER'];
+        $spkDate = null;
+        if (is_numeric($row['SPK DATE'])) {
+            $spkDate = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['SPK DATE'])->format('Y-m-d');
+        } else if (is_string($row['SPK DATE'])) {
+            $dateTime = \DateTime::createFromFormat('d/m/Y', $row['SPK DATE']);
+            if ($dateTime !== false) {
+                $spkDate = $dateTime->format('Y-m-d');
+            } else {
+                echo "Invalid date format";
+            }
+        }
+
+        $woDate = null;
+        if (is_numeric($row['WO DATE'])) {
+            $woDate = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['WO DATE'])->format('Y-m-d');
+        } else if (is_string($row['WO DATE'])) {
+            $dateTime = \DateTime::createFromFormat('d/m/Y', $row['WO DATE']);
+            if ($dateTime !== false) {
+                $woDate = $dateTime->format('Y-m-d');
+            } else {
+                echo "Invalid date format";
+            }
+        }
+
         $rfiDate = null;
         if (is_numeric($row['RFI DATE'])) {
             $rfiDate = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['RFI DATE'])->format('Y-m-d');
@@ -62,6 +86,8 @@ class SalesOperatorImport implements ToModel, WithHeadingRow, WithMultipleSheets
             'final_status_site' => $row['FINAL STATUS SITE'],
             'status_xl' => $statusXL,
             'status_lms' => $row['Status LMS'],
+            'spk_date' => $spkDate,
+            'wo_date' => $woDate,
             'rfi_date' => $rfiDate,
         ];
 

@@ -19,5 +19,7 @@ class TotalLeased extends Model
         'area',
         'kat_jenis_order',
         'sow2',
+        'longitude',
+        'latitude',
     ];
 }

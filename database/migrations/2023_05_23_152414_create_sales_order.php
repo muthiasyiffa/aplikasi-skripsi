@@ -26,8 +26,12 @@ return new class extends Migration
             $table->integer('tenant_existing')->nullable();
             $table->enum('status_xl', ['On Going', 'RFI-NY BAUF', 'RFI-BAUF DONE', 'BAK Completed', 'Invoice Done', 'DROP'])->nullable();
             $table->string('status_lms')->length(255);
+            $table->date('spk_date')->nullable();
+            $table->date('wo_date')->nullable();
             $table->date('rfi_date')->nullable();
             $table->enum('final_status_site', ['RFI', 'On Going', 'DROP'])->nullable()->length(255);
+            $table->string('aging_spk_to_wo')->nullable();
+            $table->string('aging_wo_to_rfi')->nullable();
             $table->string('aging_rfi_to_bak')->nullable();
             $table->timestamps();
         });

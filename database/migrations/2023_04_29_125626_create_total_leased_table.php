@@ -20,6 +20,8 @@ return new class extends Migration
             $table->enum('area', ['Area 1', 'Area 2', 'Area 3', 'Area 4']);
             $table->enum('kat_jenis_order', ['New Build', 'Existing']);
             $table->enum('sow2', ['B2S', 'COLO'])->nullable();
+            $table->string('longitude')->nullable();
+            $table->string('latitude')->nullable();
             $table->timestamps();
         });
     }

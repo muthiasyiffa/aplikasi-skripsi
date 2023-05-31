@@ -33,6 +33,8 @@ class TotalLeasedImport implements ToModel, WithHeadingRow, WithMultipleSheets
             'area' => $row['AREA'],
             'kat_jenis_order' => $row['KAT JENIS ORDER'],
             'sow2' => $row['SOW2'],
+            'longitude' => $row['LONGITUDE'],
+            'latitude' => $row['LATITUDE']
         ];
 
         $searchCriteria = [

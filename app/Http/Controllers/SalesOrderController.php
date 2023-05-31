@@ -25,9 +25,47 @@ class SalesOrderController extends Controller
         $totalTowerCount = $salesOrders->count();
 
         foreach ($salesOrders as $salesOrder) {
+            $spkDate = $salesOrder->spk_date;
+            $woDate = $salesOrder->wo_date;
+            $statusSite = $salesOrder->final_status_site;
+            if (is_null($spkDate)) {
+                if ($statusSite === 'DROP'){
+                    $salesOrder->aging_spk_to_wo = 'DROP Site';
+                } else if ($spkDate == '1900-01-01' || $spkDate === null) {
+                    $salesOrder->aging_spk_to_wo = 'Not yet SPK';
+                } else if ($woDate == '1900-01-01' || $woDate === null) {
+                    $salesOrder->aging_spk_to_wo = 'Not yet WO';
+                } else {
+                    $aging = \Carbon\Carbon::parse($spkDate)->diffInDays($woDate);
+                    $salesOrder->aging_spk_to_wo = (string) $aging;
+                }
+                $salesOrder->save();
+            }
+        }
+
+        foreach ($salesOrders as $salesOrder) {
+            $woDate = $salesOrder->wo_date;
+            $rfiDate = $salesOrder->rfi_date;
+            $statusSite = $salesOrder->final_status_site;
+            if (is_null($woDate)) {
+                if ($statusSite === 'DROP') {
+                    $salesOrder->aging_wo_to_rfi = 'DROP Site';
+                } else if ($woDate == '1900-01-01' || $woDate === null) {
+                    $salesOrder->aging_wo_to_rfi = 'Not yet WO';
+                } else if ($rfiDate == '1970-01-01'|| $rfiDate === null) {
+                    $salesOrder->aging_wo_to_rfi = 'Not yet RFI';
+                } else {
+                    $aging = \Carbon\Carbon::parse($woDate)->diffInDays($rfiDate);
+                    $salesOrder->aging_wo_to_rfi = (string) $aging;
+                }
+                $salesOrder->save();
+            }
+        }
+
+        foreach ($salesOrders as $salesOrder) {
             $statusXL = $salesOrder->status_xl;
             $rfiDate = $salesOrder->rfi_date;
-            if($statusXL === "RFI-NY BAUF" || $statusXL === "RFI-BAUF DONE") {
+            if($statusXL === "RFI-NY BAUF" && $statusXL === "RFI-BAUF DONE") {
                 if ($rfiDate) {
                     if ($rfiDate == '1970-01-01') {
                         $salesOrder->aging_rfi_to_bak = 'Not yet RFI';
