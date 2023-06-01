@@ -65,7 +65,7 @@ class SalesOrderController extends Controller
         foreach ($salesOrders as $salesOrder) {
             $statusXL = $salesOrder->status_xl;
             $rfiDate = $salesOrder->rfi_date;
-            if($statusXL === "RFI-NY BAUF" && $statusXL === "RFI-BAUF DONE") {
+            if($statusXL === "RFI-NY BAUF" || $statusXL === "RFI-BAUF DONE") {
                 if ($rfiDate) {
                     if ($rfiDate == '1970-01-01') {
                         $salesOrder->aging_rfi_to_bak = 'Not yet RFI';

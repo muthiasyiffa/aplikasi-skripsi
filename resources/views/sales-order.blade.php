@@ -161,16 +161,219 @@
                     </div>
                 </div>
                 <div class="card m-4">
-                    <div class="card-header">Aging Order RFI - BAK</div>
+                    <div class="card-header">Aging Order SPK to WO</div>
                     <div class= "filter">
                         <label for="filterCategory">Filter Data Aging</label>
-                        <select id="filterCategory">
+                        <select id="filterCategorySPKWO">
                             <option value="all">All Categories</option>
                             <option value="Low Attention">Low Attention</option>
                             <option value="Attention">Attention</option>
                             <option value="Need More Attention">Need More Attention</option>
                         </select>
-                        <select id="filterStatus">
+                        <select id="filterStatusSPKWO">
+                            <option value="all">All Status</option>
+                            @foreach($towerCountsByStatusXL as $towerCountByStatusXL)
+                                @if($towerCountByStatusXL->status_xl !== "DROP")
+                                    <option value="{{ $towerCountByStatusXL->status_xl }}">{{ $towerCountByStatusXL->status_xl }}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="card m-4">
+                        <div class="table-container">
+                            <table id="agingSPKTable" class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th class="contain-header">No.</th>
+                                        <th class="contain-header">PID</th>
+                                        <th class="contain-header">Site ID</th>
+                                        <th class="contain-header">Site Name</th>
+                                        <th class="contain-header">Status Site</th>
+                                        <th class="contain-header">Aging</th>
+                                        <th class="contain-header">Category Aging</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php
+                                        $counter = 1;
+                                    @endphp
+                                    @foreach($salesOrders as $salesOrder)
+                                        @if($salesOrder->status_xl !== 'DROP')
+                                            <tr>
+                                                <td class="contain-header vermid">{{ $counter++ }}</td>
+                                                <td class="contain-header vermid">{{ $salesOrder->pid }}</td>
+                                                <td class="contain-header vermid">{{ $salesOrder->site_id_tenant }}</td>
+                                                <td class="contain-header vermid">{{ $salesOrder->site_name }}</td>
+                                                <td class="contain-header vermid">{{ $salesOrder->status_xl }}</td>
+                                                <td class="contain-header vermid">
+                                                    @if ($salesOrder->aging_spk_to_wo === 'Not yet SPK' || $salesOrder->aging_spk_to_wo === 'Not yet WO')
+                                                        {{ $salesOrder->aging_spk_to_wo }}
+                                                    @else
+                                                        {{ $salesOrder->aging_spk_to_wo }} days
+                                                    @endif
+                                                </td>
+                                                <td class="contain-header vermid">
+                                                    @if($salesOrder->aging_spk_to_wo <= 4)
+                                                        <button class="btn btn-success aging-button">Low Attention</button>
+                                                    @elseif($salesOrder->aging_spk_to_wo >= 5 && $salesOrder->aging_spk_to_wo <= 7)
+                                                        <button class="btn btn-warning aging-button">Attention</button>
+                                                    @elseif($salesOrder->aging_spk_to_wo > 7)
+                                                        <button class="btn btn-danger aging-button">Need More Attention</button>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endif
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="legend-container">
+                        <label>Legend:</label>
+                        <div class="legend-item">
+                            <button class="btn btn-success aging-button btn-sm">Low Attention</button>
+                            <span>0 - 4 days</span>
+                        </div>
+                        <div class="legend-item">
+                            <button class="btn btn-warning aging-button btn-sm">Attention</button>
+                            <span>5 - 7 days</span>
+                        </div>
+                        <div class="legend-item">
+                            <button class="btn btn-danger aging-button btn-sm">Need More Attention</button>
+                            <span> > 7 days / Not yet SPK / Not yet WO</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card m-4">
+                    <div class="card-header">Aging Order WO to RFI</div>
+                    <div class= "filter">
+                        <label for="filterCategory">Filter Data Aging</label>
+                        <select id="filterCategoryWORFI">
+                            <option value="all">All Categories</option>
+                            <option value="Low Attention">Low Attention</option>
+                            <option value="Attention">Attention</option>
+                            <option value="Need More Attention">Need More Attention</option>
+                        </select>
+                        <select id="filterStatusWORFI">
+                            <option value="all">All Status</option>
+                            @foreach($towerCountsByStatusXL as $towerCountByStatusXL)
+                                @if($towerCountByStatusXL->status_xl !== "DROP")
+                                    <option value="{{ $towerCountByStatusXL->status_xl }}">{{ $towerCountByStatusXL->status_xl }}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                        <select id="filterSOWWORFI">
+                            <option value="all">All SOW</option>
+                            <option value="B2S">B2S</option>
+                            <option value="COLO">COLO</option>
+                        </select>
+                    </div>
+                    <div class="card m-4">
+                        <div class="table-container">
+                            <table id="agingWOTable" class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th class="contain-header">No.</th>
+                                        <th class="contain-header">PID</th>
+                                        <th class="contain-header">Site ID</th>
+                                        <th class="contain-header">Site Name</th>
+                                        <th class="contain-header">SOW2</th>
+                                        <th class="contain-header">Status Site</th>
+                                        <th class="contain-header">Aging</th>
+                                        <th class="contain-header">Category Aging</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php
+                                        $counter = 1;
+                                    @endphp
+                                    @foreach($salesOrders as $salesOrder)
+                                        @if($salesOrder->status_xl !== 'DROP')
+                                            <tr>
+                                                <td class="contain-header vermid">{{ $counter++ }}</td>
+                                                <td class="contain-header vermid">{{ $salesOrder->pid }}</td>
+                                                <td class="contain-header vermid">{{ $salesOrder->site_id_tenant }}</td>
+                                                <td class="contain-header vermid">{{ $salesOrder->site_name }}</td>
+                                                <td class="contain-header vermid">{{ $salesOrder->sow2 }}</td>
+                                                <td class="contain-header vermid">{{ $salesOrder->status_xl }}</td>
+                                                <td class="contain-header vermid">
+                                                    @if ($salesOrder->aging_wo_to_rfi === 'Not yet WO' || $salesOrder->aging_wo_to_rfi === 'Not yet RFI')
+                                                        {{ $salesOrder->aging_wo_to_rfi }}
+                                                    @else
+                                                        {{ $salesOrder->aging_wo_to_rfi }} days
+                                                    @endif
+                                                </td>
+                                                <td class="contain-header vermid">
+                                                    @if($salesOrder->sow2 === 'B2S')
+                                                        @if($salesOrder->aging_wo_to_rfi <= 60)
+                                                            <button class="btn btn-success aging-button">Low Attention</button>
+                                                        @elseif($salesOrder->aging_wo_to_rfi >= 61 && $salesOrder->aging_wo_to_rfi <= 85)
+                                                            <button class="btn btn-warning aging-button">Attention</button>
+                                                        @elseif($salesOrder->aging_wo_to_rfi > 85)
+                                                            <button class="btn btn-danger aging-button">Need More Attention</button>
+                                                        @endif
+                                                    @endif
+                                                    @if($salesOrder->sow2 === 'COLO')
+                                                        @if($salesOrder->aging_wo_to_rfi <= 20)
+                                                            <button class="btn btn-success aging-button">Low Attention</button>
+                                                        @elseif($salesOrder->aging_wo_to_rfi >= 21 && $salesOrder->aging_wo_to_rfi <= 40)
+                                                            <button class="btn btn-warning aging-button">Attention</button>
+                                                        @elseif($salesOrder->aging_wo_to_rfi > 40)
+                                                            <button class="btn btn-danger aging-button">Need More Attention</button>
+                                                        @endif
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endif
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="legend-container">
+                        <label>Legend B2S :</label>
+                        <div class="legend-item">
+                            <button class="btn btn-success aging-button btn-sm">Low Attention</button>
+                            <span>0 - 60 days</span>
+                        </div>
+                        <div class="legend-item">
+                            <button class="btn btn-warning aging-button btn-sm">Attention</button>
+                            <span>61 - 85 days</span>
+                        </div>
+                        <div class="legend-item">
+                            <button class="btn btn-danger aging-button btn-sm">Need More Attention</button>
+                            <span> > 85 days / Not yet WO / Not yet RFI</span>
+                        </div>
+                    </div>
+                    <div class="legend-container">
+                        <label>Legend COLO :</label>
+                        <div class="legend-item">
+                            <button class="btn btn-success aging-button btn-sm">Low Attention</button>
+                            <span>0 - 20 days</span>
+                        </div>
+                        <div class="legend-item">
+                            <button class="btn btn-warning aging-button btn-sm">Attention</button>
+                            <span>21 - 40 days</span>
+                        </div>
+                        <div class="legend-item">
+                            <button class="btn btn-danger aging-button btn-sm">Need More Attention</button>
+                            <span> > 40 days / Not yet WO / Not yet RFI</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card m-4">
+                    <div class="card-header">Aging Order RFI - BAK</div>
+                    <div class= "filter">
+                        <label for="filterCategory">Filter Data Aging</label>
+                        <select id="filterCategoryRFIBAK">
+                            <option value="all">All Categories</option>
+                            <option value="Low Attention">Low Attention</option>
+                            <option value="Attention">Attention</option>
+                            <option value="Need More Attention">Need More Attention</option>
+                        </select>
+                        <select id="filterStatusRFIBAK">
                             <option value="all">All Status</option>
                             <option value="RFI-NY BAUF">RFI-NY BAUF</option>
                             <option value="RFI-BAUF DONE">RFI-BAUF DONE</option>
@@ -178,7 +381,7 @@
                     </div>
                     <div class="card m-4">
                         <div class="table-container">
-                            <table id="salesTable" class="table table-striped">
+                            <table id="agingRFITable" class="table table-striped">
                                 <thead>
                                     <tr>
                                         <th class="contain-header">No.</th>
@@ -197,24 +400,24 @@
                                     @foreach($salesOrders as $salesOrder)
                                         @if($salesOrder->status_xl == "RFI-NY BAUF" || $salesOrder->status_xl == "RFI-BAUF DONE")
                                             <tr>
-                                                <td class="contain-header">{{ $counter++ }}</td>
-                                                <td class="contain-header">{{ $salesOrder->pid }}</td>
-                                                <td class="contain-header">{{ $salesOrder->site_id_tenant }}</td>
-                                                <td class="contain-header">{{ $salesOrder->site_name }}</td>
-                                                <td class="contain-header">{{ $salesOrder->status_xl }}</td>
-                                                <td class="contain-header">
+                                                <td class="contain-header vermid">{{ $counter++ }}</td>
+                                                <td class="contain-header vermid">{{ $salesOrder->pid }}</td>
+                                                <td class="contain-header vermid">{{ $salesOrder->site_id_tenant }}</td>
+                                                <td class="contain-header vermid">{{ $salesOrder->site_name }}</td>
+                                                <td class="contain-header vermid">{{ $salesOrder->status_xl }}</td>
+                                                <td class="contain-header vermid">
                                                     @if ($salesOrder->aging_rfi_to_bak === 'Not yet RFI')
                                                         {{ $salesOrder->aging_rfi_to_bak }}
                                                     @else
                                                         {{ $salesOrder->aging_rfi_to_bak }} days
                                                     @endif
                                                 </td>
-                                                <td class="contain-header">
+                                                <td class="contain-header vermid">
                                                     @if($salesOrder->aging_rfi_to_bak <= 14)
                                                         <button class="btn btn-success aging-button">Low Attention</button>
-                                                    @elseif($salesOrder->aging_rfi_to_bak >= 15 && $salesOrder->aging_rfi_to_bak <= 24)
+                                                    @elseif($salesOrder->aging_rfi_to_bak >= 15 && $salesOrder->aging_rfi_to_bak <= 25)
                                                         <button class="btn btn-warning aging-button">Attention</button>
-                                                    @elseif($salesOrder->aging_rfi_to_bak >= 25)
+                                                    @elseif($salesOrder->aging_rfi_to_bak > 25)
                                                         <button class="btn btn-danger aging-button">Need More Attention</button>
                                                     @endif
                                                 </td>
@@ -233,11 +436,11 @@
                         </div>
                         <div class="legend-item">
                             <button class="btn btn-warning aging-button btn-sm">Attention</button>
-                            <span>15 - 24 days</span>
+                            <span>15 - 25 days</span>
                         </div>
                         <div class="legend-item">
                             <button class="btn btn-danger aging-button btn-sm">Need More Attention</button>
-                            <span> < 25 days</span>
+                            <span> > 25 days / Not yet RFI</span>
                         </div>
                     </div>
                 </div>
@@ -251,62 +454,6 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.css" />
 
 <script>
-
-    $(document).ready(function() {
-        function updateNumbering() {
-            $("#salesTable tbody tr:visible").each(function(index) {
-                $(this).find(".contain-header:first").text(index + 1);
-            });
-        }
-
-        function applyFilterAndSort() {
-            var selectedCategory = $("#filterCategory").val();
-            var selectedStatus = $("#filterStatus").val();
-            $("#salesTable tbody tr").hide();
-
-            $("#salesTable tbody tr").each(function() {
-                var category = $(this).find(".contain-header button").text();
-                var status = $(this).find(".contain-header:nth-child(5)").text();
-                var aging = $(this).find(".contain-header:nth-child(6)").text().trim();
-
-                var showRow = (selectedCategory === "all" || category === selectedCategory) &&
-                    (selectedStatus === "all" || status === selectedStatus);
-
-                if (showRow) {
-                    $(this).show();
-                }
-            });
-
-            var rows = $("#salesTable tbody tr:visible").get();
-            rows.sort(function(a, b) {
-                var aValue = $(a).find(".contain-header:nth-child(6)").text().trim();
-                var bValue = $(b).find(".contain-header:nth-child(6)").text().trim();
-
-                if (aValue === "Not yet RFI") {
-                    return -1; // Pindahkan a ke atas
-                } else if (bValue === "Not yet RFI") {
-                    return 1; // Pindahkan b ke atas
-                } else {
-                    var aAging = parseInt(aValue.replace(' days', ''));
-                    var bAging = parseInt(bValue.replace(' days', ''));
-                    return aAging - bAging;
-                }
-            });
-
-            $.each(rows, function(index, row) {
-                $("#salesTable tbody").append(row);
-            });
-
-            updateNumbering();
-        }
-
-        $("#filterCategory, #filterStatus").on("change", function() {
-            applyFilterAndSort();
-        });
-
-        applyFilterAndSort();
-    });
-
     document.addEventListener('DOMContentLoaded', function () {
 //data maps sebaran tower
         var map = L.map('map', {
@@ -1045,6 +1192,177 @@
             }
         });
 
+    });
+
+//tabel aging SPK-WO
+    $(document).ready(function() {
+        function updateNumbering() {
+            $("#agingSPKTable tbody tr:visible").each(function(index) {
+                $(this).find(".contain-header:first").text(index + 1);
+            });
+        }
+
+        function applyFilterAndSort() {
+            var selectedCategory = $("#filterCategorySPKWO").val();
+            var selectedStatus = $("#filterStatusSPKWO").val();
+            $("#agingSPKTable tbody tr").hide();
+
+            $("#agingSPKTable tbody tr").each(function() {
+                var category = $(this).find(".contain-header button").text();
+                var status = $(this).find(".contain-header:nth-child(5)").text();
+                var aging = $(this).find(".contain-header:nth-child(6)").text().trim();
+
+                var showRow = (selectedCategory === "all" || category === selectedCategory) &&
+                    (selectedStatus === "all" || status === selectedStatus);
+
+                if (showRow) {
+                    $(this).show();
+                }
+            });
+
+            var rows = $("#agingSPKTable tbody tr:visible").get();
+            rows.sort(function(a, b) {
+                var aValue = $(a).find(".contain-header:nth-child(6)").text().trim();
+                var bValue = $(b).find(".contain-header:nth-child(6)").text().trim();
+
+                if (aValue === "Not yet SPK" || aValue === "Not yet WO") {
+                    return -1; // Pindahkan a ke atas
+                } else if (bValue === "Not yet SPK" || bValue === "Not yet WO") {
+                    return 1; // Pindahkan b ke atas
+                } else {
+                    var aAging = parseInt(aValue.replace(' days', ''));
+                    var bAging = parseInt(bValue.replace(' days', ''));
+                    return aAging - bAging;
+                }
+            });
+
+            $.each(rows, function(index, row) {
+                $("#agingSPKTable tbody").append(row);
+            });
+
+            updateNumbering();
+        }
+
+        $("#filterCategorySPKWO, #filterStatusSPKWO").on("change", function() {
+            applyFilterAndSort();
+        });
+
+        applyFilterAndSort();
+    });
+
+//tabel aging WO-RFI
+    $(document).ready(function() {
+        function updateNumbering() {
+            $("#agingWOTable tbody tr:visible").each(function(index) {
+                $(this).find(".contain-header:first").text(index + 1);
+            });
+        }
+
+        function applyFilterAndSort() {
+            var selectedCategory = $("#filterCategoryWORFI").val();
+            var selectedStatus = $("#filterStatusWORFI").val();
+            var selectedSOW = $("#filterSOWWORFI").val();
+            $("#agingWOTable tbody tr").hide();
+
+            $("#agingWOTable tbody tr").each(function() {
+                var category = $(this).find(".contain-header button").text();
+                var sow = $(this).find(".contain-header:nth-child(5)").text().trim();
+                var status = $(this).find(".contain-header:nth-child(6)").text();
+                var aging = $(this).find(".contain-header:nth-child(7)").text().trim();
+
+                var showRow = (selectedCategory === "all" || category === selectedCategory) &&
+                    (selectedStatus === "all" || status === selectedStatus) &&
+                    (selectedSOW === "all" || sow === selectedSOW);
+
+                if (showRow) {
+                    $(this).show();
+                }
+            });
+
+            var rows = $("#agingWOTable tbody tr:visible").get();
+            rows.sort(function(a, b) {
+                var aValue = $(a).find(".contain-header:nth-child(7)").text().trim();
+                var bValue = $(b).find(".contain-header:nth-child(7)").text().trim();
+
+                if (aValue === "Not yet WO" || aValue === "Not yet RFI") {
+                    return -1; // Pindahkan a ke atas
+                } else if (bValue === "Not yet WO" || bValue === "Not yet RFI") {
+                    return 1; // Pindahkan b ke atas
+                } else {
+                    var aAging = parseInt(aValue.replace(' days', ''));
+                    var bAging = parseInt(bValue.replace(' days', ''));
+                    return aAging - bAging;
+                }
+            });
+
+            $.each(rows, function(index, row) {
+                $("#agingWOTable tbody").append(row);
+            });
+
+            updateNumbering();
+        }
+
+        $("#filterCategoryWORFI, #filterStatusWORFI, #filterSOWWORFI").on("change", function() {
+            applyFilterAndSort();
+        });
+
+        applyFilterAndSort();
+    });
+
+//tabel aging RFI-BAK
+    $(document).ready(function() {
+        function updateNumbering() {
+            $("#agingRFITable tbody tr:visible").each(function(index) {
+                $(this).find(".contain-header:first").text(index + 1);
+            });
+        }
+
+        function applyFilterAndSort() {
+            var selectedCategory = $("#filterCategoryRFIBAK").val();
+            var selectedStatus = $("#filterStatusRFIBAK").val();
+            $("#agingRFITable tbody tr").hide();
+
+            $("#agingRFITable tbody tr").each(function() {
+                var category = $(this).find(".contain-header button").text();
+                var status = $(this).find(".contain-header:nth-child(5)").text();
+                var aging = $(this).find(".contain-header:nth-child(6)").text().trim();
+
+                var showRow = (selectedCategory === "all" || category === selectedCategory) &&
+                    (selectedStatus === "all" || status === selectedStatus);
+
+                if (showRow) {
+                    $(this).show();
+                }
+            });
+
+            var rows = $("#agingRFITable tbody tr:visible").get();
+            rows.sort(function(a, b) {
+                var aValue = $(a).find(".contain-header:nth-child(6)").text().trim();
+                var bValue = $(b).find(".contain-header:nth-child(6)").text().trim();
+
+                if (aValue === "Not yet RFI") {
+                    return -1; // Pindahkan a ke atas
+                } else if (bValue === "Not yet RFI") {
+                    return 1; // Pindahkan b ke atas
+                } else {
+                    var aAging = parseInt(aValue.replace(' days', ''));
+                    var bAging = parseInt(bValue.replace(' days', ''));
+                    return aAging - bAging;
+                }
+            });
+
+            $.each(rows, function(index, row) {
+                $("#agingRFITable tbody").append(row);
+            });
+
+            updateNumbering();
+        }
+
+        $("#filterCategoryRFIBAK, #filterStatusRFIBAK").on("change", function() {
+            applyFilterAndSort();
+        });
+
+        applyFilterAndSort();
     });
 </script>
 
