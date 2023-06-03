@@ -3,6 +3,23 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-header">{{ __('Total Tower Leased') }}</div>
+                    <div class="col-md-6 p-4">
+                        <div class="input-group">
+                            <textarea class="form-control" placeholder="Search" id="search-input"></textarea>
+                            <div class="input-group-append mx-2">
+                                <button class="btn btn-outline-primary" type="button" id="search-button">Search</button>
+                                <button class="btn btn-primary" id="export-button">Export to Excel</button>
+                            </div>
+                        </div>
+                    </div>
+                <div class="table-container">
+                    <div id="data-table" class="table table-striped px-3"></div>
+                </div>
+            </div>
+        </div>
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">{{ __('Dashboard') }}</div>
@@ -36,6 +53,51 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.css" />
 
 <script>
+
+    $(document).ready(function() {
+        // Fungsi untuk melakukan pencarian
+        function search() {
+            var keywords = $('#search-input').val().split('\n'); // Memisahkan berdasarkan baris baru
+
+            // Mengirim permintaan AJAX ke URL pencarian dengan kata kunci sebagai parameter
+            $.ajax({
+                url: '/search',
+                type: 'GET',
+                data: { keywords: keywords }, // Menggunakan 'keywords' sebagai parameter
+                success: function(response) {
+                    // Mengganti konten tabel dengan hasil pencarian
+                    $('#data-table').html(response);
+                },
+                error: function(xhr) {
+                    console.log(xhr.responseText);
+                }
+            });
+        }
+
+        // Meng-handle klik tombol pencarian
+        $('#search-button').click(function() {
+            search();
+        });
+
+        // Meng-handle aksi ketika tombol Enter ditekan pada input pencarian
+        $('#search-input').keypress(function(event) {
+            if (event.which === 13) { // 13 adalah kode tombol Enter
+                event.preventDefault();
+                search();
+            }
+        });
+
+        // Fungsi untuk melakukan ekspor ke Excel
+        function exportToExcel() {
+            // Mengarahkan pengguna ke URL ekspor ke Excel
+            window.location.href = '/export';
+        }
+
+        // Meng-handle klik tombol ekspor
+        $('#export-button').click(function() {
+            exportToExcel();
+        });
+    });
     
     document.addEventListener('DOMContentLoaded', function () {
         var map = L.map('map', {
@@ -392,6 +454,23 @@
             font-size: 28px;
             font-weight: bold;
             text-align: center;
+        }
+
+        .table-container {
+            display: flex;
+            justify-content: space-between;
+            max-height: 400px;
+            overflow: auto;
+        }
+
+        .table-container thead {
+            position: sticky;
+            top: 0;
+            background-color: white;
+        }
+
+        .input-group-append{
+            margin-top: 10px;
         }
         
     </style>

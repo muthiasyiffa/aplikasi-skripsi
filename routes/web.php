@@ -25,6 +25,9 @@ Route::get('/', function () {
 Auth::routes(['verify' => true]);
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home')->middleware('auth', 'verified');
+Route::get('/search', [App\Http\Controllers\HomeController::class, 'search'])->middleware('auth', 'verified');
+Route::get('/export', [App\Http\Controllers\HomeController::class, 'exportToExcel'])->middleware('auth', 'verified');
+
 
 Route::middleware(['auth', 'role:operator'])->group(function () {
     Route::get('/upload-data', [App\Http\Controllers\UploadDataController::class, 'index'])->name('upload-data')->middleware('auth', 'verified');
