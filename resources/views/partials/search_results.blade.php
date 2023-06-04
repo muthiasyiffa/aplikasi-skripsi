@@ -1,4 +1,12 @@
-<table class="table">
+<style>
+    .custom-table th,
+    .custom-table td {
+    width: auto;
+    white-space: nowrap;
+    }
+</style>
+
+<table class="table custom-table">
     <thead>
         <tr>
             <th>Site ID Tenant</th>

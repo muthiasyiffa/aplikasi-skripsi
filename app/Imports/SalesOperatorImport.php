@@ -36,7 +36,9 @@ class SalesOperatorImport implements ToModel, WithHeadingRow, WithMultipleSheets
         $statusXL = ($row['Status XL'] === $nullValue || $row['Status XL'] == null) ? null : $row['Status XL'];
         $katTower = ($row['KATEGORI TOWER'] === $nullValue || $row['KATEGORI TOWER'] == null) ? null : $row['KATEGORI TOWER'];
         $spkDate = null;
-        if (is_numeric($row['SPK DATE'])) {
+        if ($row['SPK DATE'] === '#N/A') {
+            $spkDate = '1900-01-01';
+        } else if (is_numeric($row['SPK DATE'])) {
             $spkDate = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['SPK DATE'])->format('Y-m-d');
         } else if (is_string($row['SPK DATE'])) {
             $dateTime = \DateTime::createFromFormat('d/m/Y', $row['SPK DATE']);
@@ -48,7 +50,9 @@ class SalesOperatorImport implements ToModel, WithHeadingRow, WithMultipleSheets
         }
 
         $woDate = null;
-        if (is_numeric($row['WO DATE'])) {
+        if ($row['WO DATE'] === null) {
+            $woDate = '1900-01-01';
+        } else if (is_numeric($row['WO DATE'])) {
             $woDate = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['WO DATE'])->format('Y-m-d');
         } else if (is_string($row['WO DATE'])) {
             $dateTime = \DateTime::createFromFormat('d/m/Y', $row['WO DATE']);
@@ -60,7 +64,9 @@ class SalesOperatorImport implements ToModel, WithHeadingRow, WithMultipleSheets
         }
 
         $rfiDate = null;
-        if (is_numeric($row['RFI DATE'])) {
+        if ($row['RFI DATE'] === null) {
+            $rfiDate = '1900-01-01';
+        } else if (is_numeric($row['RFI DATE'])) {
             $rfiDate = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['RFI DATE'])->format('Y-m-d');
         } else if (is_string($row['RFI DATE'])) {
             $dateTime = \DateTime::createFromFormat('d/m/Y', $row['RFI DATE']);
@@ -83,9 +89,9 @@ class SalesOperatorImport implements ToModel, WithHeadingRow, WithMultipleSheets
             'kat_tower' => $katTower,
             'demografi' => $row['DEMOGRAFI'],
             'tenant_existing' => $tenantExisting,
-            'final_status_site' => $row['FINAL STATUS SITE'],
-            'status_xl' => $statusXL,
             'status_lms' => $row['Status LMS'],
+            'status_xl' => $statusXL,
+            'final_status_site' => $row['FINAL STATUS SITE'],
             'spk_date' => $spkDate,
             'wo_date' => $woDate,
             'rfi_date' => $rfiDate,

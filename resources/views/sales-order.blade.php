@@ -3,10 +3,27 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-header">{{ __('Sales Order') }} {{ $tahun }} </div>
+                    <div class="col-md-6 p-4">
+                        <div class="input-group">
+                            <textarea class="form-control" placeholder="Search" id="search-input"></textarea>
+                            <div class="input-group-append mx-2">
+                                <button class="btn btn-outline-primary" type="button" id="search-button">Search</button>
+                                <button class="btn btn-primary" id="export-button">Export to Excel</button>
+                            </div>
+                        </div>
+                    </div>
+                <div class="table-container">
+                    <div id="data-table" class="table table-striped px-3"></div>
+                </div>
+            </div>
+        </div>
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    {{ __('Sales Order') }}
+                    {{ __('Overview Sales Order') }}
                     {{ $tahun }}    
                 </div>
                 <div class="card m-4 map-container">
@@ -1364,6 +1381,56 @@
 
         applyFilterAndSort();
     });
+//search & export
+    $(document).ready(function() {
+        // Fungsi untuk melakukan pencarian
+        function search() {
+            var tahun = '{{ $tahun }}'; // Ambil nilai tahun dari PHP
+
+            var keywords = $('#search-input').val().split('\n'); // Memisahkan berdasarkan baris baru
+
+            // Mengirim permintaan AJAX ke URL pencarian dengan kata kunci dan tahun sebagai parameter
+            $.ajax({
+                url: '/sales-order/' + tahun + '/search',
+                type: 'GET',
+                data: { keywords: keywords }, // Menggunakan 'keywords' sebagai parameter
+                success: function(response) {
+                    // Mengganti konten tabel dengan hasil pencarian
+                    $('#data-table').html(response);
+                },
+                error: function(xhr) {
+                    console.log(xhr.responseText);
+                }
+            });
+        }
+
+        // Meng-handle klik tombol pencarian
+        $('#search-button').click(function() {
+            search();
+        });
+
+        // Meng-handle aksi ketika tombol Enter ditekan pada input pencarian
+        $('#search-input').keypress(function(event) {
+            if (event.which === 13) { // 13 adalah kode tombol Enter
+                event.preventDefault();
+                search();
+            }
+        });
+
+        // Fungsi untuk melakukan ekspor ke Excel
+        function exportToExcel() {
+            var tahun = '{{ $tahun }}'; // Ambil nilai tahun dari PHP
+
+            // Mengarahkan pengguna ke URL ekspor ke Excel dengan tahun sebagai parameter
+            window.location.href = '/sales-order/' + tahun + '/export';
+        }
+
+        // Meng-handle klik tombol ekspor
+        $('#export-button').click(function() {
+            exportToExcel();
+        });
+    });
+
 </script>
 
 @endsection
@@ -1551,5 +1618,22 @@
 
         .legend-item button {
             margin-right: 5px;
+        }
+
+        .table-container {
+            display: flex;
+            justify-content: space-between;
+            max-height: 400px;
+            overflow: auto;
+        }
+
+        .table-container thead {
+            position: sticky;
+            top: 0;
+            background-color: white;
+        }
+
+        .input-group-append{
+            margin-top: 10px;
         }
     </style>

@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\SalesOrder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\SalesOrderExport;
 
 class SalesOrderController extends Controller
 {
@@ -18,6 +21,52 @@ class SalesOrderController extends Controller
         return '';
     }
 
+    /**
+     * Handle the search request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function search(Request $request, $tahun)
+    {
+        $keywords = $request->input('keywords');
+
+        session(['search_keyword' => $keywords]);
+
+        // Query data SalesOrder berdasarkan keyword pencarian dan tahun
+        $salesOrders = SalesOrder::whereIn('pid', $keywords)->where('tahun', $tahun)->get();
+
+        if (!$keywords) {
+            session()->forget('search_keyword');
+        }
+
+        // Mengembalikan view partial yang berisi tabel dengan hasil pencarian
+        return view('partials.search_resultsSO', compact('salesOrders'));
+    }
+
+    public function exportToExcel($tahun)
+    {
+        // Mendapatkan nilai keyword dari session
+        $keywords = session('search_keyword');
+
+        // Cek apakah ada keyword pencarian atau tidak
+        if ($keywords) {
+            // Query untuk mendapatkan data SalesOrder sesuai dengan keyword pencarian dan tahun
+            $salesOrders = SalesOrder::whereIn('pid', $keywords)->where('tahun', $tahun)->get();
+        } else {
+            // Query untuk mendapatkan semua data SalesOrder berdasarkan tahun
+            $salesOrders = SalesOrder::where('tahun', $tahun)->get();
+        }
+
+        session()->forget('search_keyword');
+
+        $filename = 'sales_orders_' . $tahun . '.xlsx';
+
+        // Menggunakan SalesOrderExport dengan parameter $salesOrders
+        return Excel::download(new SalesOrderExport($salesOrders), $filename);
+    }
+
+
     public function show($tahun)
     {
         $currentDate = \Carbon\Carbon::now()->toDateString();
@@ -28,12 +77,12 @@ class SalesOrderController extends Controller
             $spkDate = $salesOrder->spk_date;
             $woDate = $salesOrder->wo_date;
             $statusSite = $salesOrder->final_status_site;
-            if (is_null($spkDate)) {
+            if ($spkDate) {
                 if ($statusSite === 'DROP'){
                     $salesOrder->aging_spk_to_wo = 'DROP Site';
-                } else if ($spkDate == '1900-01-01' || $spkDate === null) {
+                } else if ($spkDate == '1900-01-01' || $spkDate == '1970-01-01') {
                     $salesOrder->aging_spk_to_wo = 'Not yet SPK';
-                } else if ($woDate == '1900-01-01' || $woDate === null) {
+                } else if ($woDate == '1900-01-01' || $woDate == '1970-01-01') {
                     $salesOrder->aging_spk_to_wo = 'Not yet WO';
                 } else {
                     $aging = \Carbon\Carbon::parse($spkDate)->diffInDays($woDate);
@@ -47,12 +96,12 @@ class SalesOrderController extends Controller
             $woDate = $salesOrder->wo_date;
             $rfiDate = $salesOrder->rfi_date;
             $statusSite = $salesOrder->final_status_site;
-            if (is_null($woDate)) {
+            if ($woDate) {
                 if ($statusSite === 'DROP') {
                     $salesOrder->aging_wo_to_rfi = 'DROP Site';
-                } else if ($woDate == '1900-01-01' || $woDate === null) {
+                } else if ($woDate == '1900-01-01' || $woDate == '1970-01-01') {
                     $salesOrder->aging_wo_to_rfi = 'Not yet WO';
-                } else if ($rfiDate == '1970-01-01'|| $rfiDate === null) {
+                } else if ($rfiDate == '1900-01-01'|| $rfiDate == '1970-01-01') {
                     $salesOrder->aging_wo_to_rfi = 'Not yet RFI';
                 } else {
                     $aging = \Carbon\Carbon::parse($woDate)->diffInDays($rfiDate);
@@ -67,7 +116,7 @@ class SalesOrderController extends Controller
             $rfiDate = $salesOrder->rfi_date;
             if($statusXL === "RFI-NY BAUF" || $statusXL === "RFI-BAUF DONE") {
                 if ($rfiDate) {
-                    if ($rfiDate == '1970-01-01') {
+                    if ($rfiDate == '1900-01-01' || $rfiDate == '1970-01-01') {
                         $salesOrder->aging_rfi_to_bak = 'Not yet RFI';
                     } else {
                         $aging = \Carbon\Carbon::parse($rfiDate)->diffInDays($currentDate);
