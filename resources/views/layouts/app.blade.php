@@ -25,13 +25,16 @@
             flex-direction: column;
             position: relative;
             background: url('https://images.unsplash.com/photo-1533664488202-6af66d26c44a?ixid=Mnw5MTMyMXwwfDF8c2VhcmNofDF8fHRlbGVjb21tdW5pY2F0aW9ufGVufDB8fHx8MTY4MzA4MzgzOA&ixlib=rb-4.0.3&w=1400') center center;
-            background-size: cover;
+            background-size: contain;
+            background-repeat: repeat;
+            background-position: center;
         }
 
         footer {
             background-color: #f2f2f2;
             padding-top: 10px;
             margin-top: auto;
+            position: relative;
         }
 
         body::before {
