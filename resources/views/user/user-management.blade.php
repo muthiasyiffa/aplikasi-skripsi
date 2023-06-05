@@ -35,7 +35,11 @@
                                     <td class="contain">{{ $user->email }}</td>
                                     <td class="contain">{{ $user->role }}</td>
                                     <td class="contain-header">
-                                        <button type="button" class="btn btn-danger delete-btn" data-toggle="modal" data-target="#confirmDeleteModal" data-user-id="{{ $user->id }}">Delete</button>
+                                        <form action="{{ route('user-management.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this account?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger del">Delete</button>
+                                        </form>
                                     </td>
                                 </tr>
                             @endforeach
@@ -49,48 +53,9 @@
     </div>
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Account Deletion</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete this account?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <form action="{{ route('user-management.destroy', $user) }}" method="POST" id="deleteForm">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 @endsection
 
 @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let deleteBtns = document.getElementsByClassName('delete-btn');
-
-            Array.prototype.forEach.call(deleteBtns, function(btn) {
-                btn.addEventListener('click', function() {
-                    let userId = this.getAttribute('data-user-id');
-                    let deleteForm = document.getElementById('deleteForm');
-                    let deleteFormAction = deleteForm.action.replace(':user_id', userId);
-                    deleteForm.action = deleteFormAction;
-                    $('#confirmDeleteModal').modal('show');
-                });
-            });
-        });
-    </script>
 @endpush
 
 @push('styles')
@@ -117,7 +82,7 @@
         }
         
         .del {
-            margin-top: 15%;
+            margin-top: 10%;
         }
 
         .save {

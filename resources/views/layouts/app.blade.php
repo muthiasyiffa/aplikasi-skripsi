@@ -23,12 +23,25 @@
             min-height: 100%;
             display: flex;
             flex-direction: column;
+            position: relative;
+            background: url('https://images.unsplash.com/photo-1533664488202-6af66d26c44a?ixid=Mnw5MTMyMXwwfDF8c2VhcmNofDF8fHRlbGVjb21tdW5pY2F0aW9ufGVufDB8fHx8MTY4MzA4MzgzOA&ixlib=rb-4.0.3&w=1400') center center;
+            background-size: cover;
         }
 
         footer {
             background-color: #f2f2f2;
             padding-top: 10px;
             margin-top: auto;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.6);
         }
     </style>
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
@@ -122,7 +135,7 @@
         </main>
     </div>
 
-    <footer class="footer">
+    <footer class="footer ">
         <div class="container">
             <p>© 2023 Sales2 Dayamitra Telekomunikasi, All Rights Reserved.</p>
         </div>

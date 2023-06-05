@@ -38,25 +38,19 @@ class HomeController extends Controller
         $geojsonFiles = File::files(public_path('js/geojson/province'));
 
         // Mengambil data jumlah tower per pulau
-        $towerCountsByPulau = TotalLeased::select('pulau', DB::raw('count(*) as total'))
-            ->groupBy('pulau')
-            ->get();
+        $towerCountsByPulau = TotalLeased::select('pulau', DB::raw('count(*) as total'))->groupBy('pulau')->get();
 
         // Mengambil data jumlah tower per pulau dan sow2
-        $towerCountsByPulauSow = TotalLeased::select('pulau', 'sow2', DB::raw('count(*) as total'))
-            ->groupBy('pulau', 'sow2')
-            ->get();
+        $towerCountsByPulauSow = TotalLeased::select('pulau', 'sow2', DB::raw('count(*) as total'))->groupBy('pulau', 'sow2')->get();
 
         // Mengambil data jumlah tower per sow2
-        $towerCountsBySow = TotalLeased::select('sow2', DB::raw('count(*) as total'))
-            ->groupBy('sow2')
-            ->get();
+        $towerCountsBySow = TotalLeased::select('sow2', DB::raw('count(*) as total'))->groupBy('sow2')->get();
 
         // Mengambil data jumlah tower per sow2 berdasarkan area
-        $towerCountsBySowArea = TotalLeased::select('sow2', 'area', DB::raw('count(*) as total'))
-            ->where('sow2', 'COLO')
-            ->groupBy('sow2', 'area')
-            ->get();
+        $towerCountsBySowArea = TotalLeased::select('sow2', 'area', DB::raw('count(*) as total'))->where('sow2', 'COLO')->groupBy('sow2', 'area')->get();
+
+        // Mengambil data jumlah tower per sow2 "COLO" berdasarkan area dan regional
+        $towerCountsByAreaSowReg = TotalLeased::select('regional', 'area', 'sow2', \DB::raw('count(*) as total'))->where('sow2', 'COLO')->whereIn('sow2', ['COLO'])->groupBy('regional', 'area', 'sow2')->get();
 
         // Menyiapkan array untuk menyimpan data tower colo per area
         $coloDataByArea = [];
@@ -78,6 +72,7 @@ class HomeController extends Controller
             'towerCountsByPulau' => $towerCountsByPulau,
             'towerCountsByPulauSow' => $towerCountsByPulauSow,
             'towerCountsBySow' => $towerCountsBySow,
+            'towerCountsByAreaSowReg' => $towerCountsByAreaSowReg,
             'coloDataByArea' => $coloDataByArea
         ]);
     }

@@ -6,12 +6,20 @@
         <div class="col-md-12 mb-4">
             <div class="card">
                 <div class="card-header">{{ __('Sales Order') }} {{ $tahun }} </div>
-                    <div class="col-md-6 p-4">
+                    <div class="col-md-8 p-4">
                         <div class="input-group">
-                            <textarea class="form-control" placeholder="Search" id="search-input"></textarea>
+                            <textarea class="form-control" placeholder="Search by PID" id="search-input"></textarea>
                             <div class="input-group-append mx-2">
                                 <button class="btn btn-outline-primary" type="button" id="search-button">Search</button>
                                 <button class="btn btn-primary" id="export-button">Export to Excel</button>
+                                @if(Auth::check())
+                                    @if(Auth::user()->role == 'admin')
+                                        <form id="delete-form" action="{{ route('sales-order-delete.tahun', ['tahun' => $tahun]) }}" method="GET">
+                                            @csrf
+                                            <button type="submit" class="btn btn-danger mt-1" onclick="return confirm('Are you sure you want to delete data Sales Order {{ $tahun }}?')">Delete Data {{ $tahun }}</button>
+                                        </form>
+                                    @endif
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -80,9 +88,6 @@
                     </div>
                     <div class="col-md-7">
                         <div class="card chart-cd shadow-sm">
-                            <button type="button" id="info-icon" class="btn btn-light" data-bs-toggle="popover" data-bs-placement="bottom">
-                                <i class="fas fa-info-circle"></i>
-                            </button>
                             <div class="chart-container">
                                 <canvas id="coloChart"></canvas>
                             </div>
@@ -100,6 +105,9 @@
                 <div class="row row-cols-1 row-cols-md-3 g-4 px-4 mt-1">
                     <div class="col">
                         <div class="card chart-cd shadow-sm">
+                            <button type="button" id="info-icon" class="btn btn-light" data-bs-toggle="popover" data-bs-placement="top">
+                                <i class="fas fa-info-circle"></i>
+                            </button>
                             <div class="chart-container">
                                 <canvas id="doughnutChart2" width="400" height="400"></canvas>
                                 <div id="doughnutHoleText2"></div>
@@ -773,43 +781,6 @@
             }
         });
 
-        const popover = new bootstrap.Popover(document.getElementById('info-icon'), {
-            container: 'body',
-            html: true,
-            content: function () {
-                // Mengambil data tower COLO
-                var coloData = @json($coloDataByKatTower);
-
-                // Menghitung total tower COLO
-                var coloTotal = Object.values(coloData).reduce((total, count) => total + count, 0);
-
-                // Mengkategorikan tower sebagai Tower Akuisisi atau Tower B2S Mitratel
-                var akuisisiTowers = ['Titan', 'Edelweiss 1A', 'Edelweiss 1B', 'Edelweiss 2', 'Edelweiss 3', 'UNO', 'Akuisisi'];
-
-                var akuisisiData = {};
-
-                // Memisahkan data tower berdasarkan kategori
-                Object.entries(coloData).forEach(([katTower, count]) => {
-                    if (akuisisiTowers.includes(katTower)) {
-                        akuisisiData[katTower] = count;
-                    }
-                });
-
-                // Menghitung total tower akuisisi
-                var akuisisiTotal = Object.values(akuisisiData).reduce((total, count) => total + count, 0);
-
-                // Membuat konten popover
-                var content = 'Dari total tower colo sebanyak <b>' + coloTotal + ' site</b>, terdapat kategori tower Bangun Mandiri atau biasa disebut B2S dan kategori tower Telkom Group. Kedua kategori tersebut <b>bukan</b> merupakan site akuisisi.';
-                content += '<br><br>'
-                content += '<b>Total Site Akuisisi : '+ akuisisiTotal + ' site</b> <br> <br>';
-
-                //Notes Site akuisisi
-                content += '<b>Titan :</b> Site akuisisi dari <b>ISAT</b><br> <b>Edelweiss 1A, 1B, 2, dan 3 :</b> Site akuisisi dari <b>TSEL</b><br>';
-                content += '<b>UNO :</b> Site akuisisi dari <b>Telkom</b><br> <b>Akuisisi :</b> Site akuisisi dari <b>perusahaan kecil</b><br>';
-
-                return content;
-            }
-        });
 //chart tenant_existing
         // Mengambil data untuk doughnut chart tenant_existing
         var coloDataByTenantExisting = {!! json_encode($coloDataByTenantExisting) !!};
@@ -1006,6 +977,54 @@
                         });
                     }
                 }
+            }
+        });
+
+        const popover = new bootstrap.Popover(document.getElementById('info-icon'), {
+            container: 'body',
+            html: true,
+            content: function () {
+                // Mengambil data tower COLO
+                var regionalData = @json($towerCountsByAreaSowReg);
+
+                // Mengkategorikan tower sebagai Tower Akuisisi atau Tower B2S Mitratel
+                var area1 = ['SUMBAGSEL', 'SUMBAGTENG', 'SUMBAGUT'];
+                var area2 = ['JABODETABEK', 'JAWA BARAT'];
+                var area3 = ['BALINUSRA', 'JAWA TENGAH', 'JAWA TIMUR'];
+                var area4 = ['KALIMANTAN', 'SULMAPUA'];
+
+                // Mengelompokkan data berdasarkan area dan regional
+                var groupedData = {
+                    'Area 1': {},
+                    'Area 2': {},
+                    'Area 3': {},
+                    'Area 4': {}
+                };
+
+                // Mengelompokkan data per area dan regional
+                regionalData.forEach((data) => {
+                    var area = data.area;
+                    var regional = data.regional;
+                    var total = data.total;
+
+                    if (!groupedData[area][regional]) {
+                        groupedData[area][regional] = 0;
+                    }
+                    groupedData[area][regional] += total;
+                });
+
+                // Membuat konten popover
+                var content = '<b> Masing-masing area mencakup beberapa wilayah regional. Berikut cakupan wilayahnya :</b>';
+                content += '<br><br>'
+                Object.entries(groupedData).forEach(([area, regionalData]) => {
+                    content += '<b>' + area + '</b><br>';
+                    Object.entries(regionalData).forEach(([regional, total]) => {
+                        content += regional + ' : ' + total + '<br>';
+                    });
+                    content += '<br>';
+                });
+
+                return content;
             }
         });
 //chart demografi
@@ -1485,13 +1504,7 @@
 
         #info-icon {
             position: absolute;
-            top: 10px;
-            right: 10px;
-        }
-
-        #info-icon1 {
-            position: absolute;
-            top: 10px;
+            top: 90%;
             right: 10px;
         }
 

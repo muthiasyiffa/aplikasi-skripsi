@@ -66,7 +66,6 @@ class SalesOrderController extends Controller
         return Excel::download(new SalesOrderExport($salesOrders), $filename);
     }
 
-
     public function show($tahun)
     {
         $currentDate = \Carbon\Carbon::now()->toDateString();
@@ -135,6 +134,8 @@ class SalesOrderController extends Controller
         $towerCountsByPulauSow = SalesOrder::select('pulau', 'sow2', \DB::raw('count(*) as total'))->where('tahun', $tahun)->groupBy('pulau', 'sow2')->get();
         // Mengambil data jumlah tower per sow2 "COLO" berdasarkan area
         $towerCountsByAreaSow = SalesOrder::select('area', 'sow2', \DB::raw('count(*) as total'))->where('tahun', $tahun)->where('sow2', 'COLO')->groupBy('area', 'sow2')->get();
+        // Mengambil data jumlah tower per sow2 "COLO" berdasarkan area dan regional
+        $towerCountsByAreaSowReg = SalesOrder::select('regional', 'area', 'sow2', \DB::raw('count(*) as total'))->where('tahun', $tahun)->where('sow2', 'COLO')->whereIn('sow2', ['COLO'])->whereIn('kat_tower', ['Titan', 'Edelweiss 1A', 'Edelweiss 1B', 'Edelweiss 2', 'Edelweiss 3', 'UNO', 'Akuisisi'])->groupBy('regional', 'area', 'sow2')->get();
         // Mengambil data jumlah tower per sow2 "B2S" berdasarkan area
         $towerCountsByAreaB2S = SalesOrder::select('area', 'sow2', \DB::raw('count(*) as total'))->where('tahun', $tahun)->where('sow2', 'B2S')->groupBy('area', 'sow2')->get();
         // Mengambil data jumlah tower per sow2 "COLO" berdasarkan kat_tower
@@ -143,7 +144,7 @@ class SalesOrderController extends Controller
         $towerCountsBySowExisting = SalesOrder::select('tenant_existing', 'sow2', \DB::raw('count(*) as total'))->where('sow2', 'COLO')->where('tahun', $tahun)->groupBy('sow2', 'tenant_existing')->get();
         // Mengambil data jumlah tower per demography
         $towerCountsByDemography = SalesOrder::select('demografi', \DB::raw('count(*) as total'))->where('tahun', $tahun)->groupBy('demografi')->get();
-        // Mengambil data jumlah tower per sow2 berdasarkan area
+        // Mengambil data jumlah tower per sow2 berdasarkan area dan site akuisisi
         $towerCountsBySowArea = SalesOrder::select('sow2', 'area', \DB::raw('count(*) as total'))->whereIn('sow2', ['COLO'])->whereIn('kat_tower', ['Titan', 'Edelweiss 1A', 'Edelweiss 1B', 'Edelweiss 2', 'Edelweiss 3', 'UNO', 'Akuisisi'])->where('tahun', $tahun)->groupBy('sow2', 'area')->get();
         // Mengambil data jumlah tower per final status site
         $towerCountsByStatus = SalesOrder::select('final_status_site', \DB::raw('count(*) as total'))->where('tahun', $tahun)->groupBy('final_status_site')->get();
@@ -225,6 +226,7 @@ class SalesOrderController extends Controller
             'towerCountsByPulau' => $towerCountsByPulau,
             'towerCountsByPulauSow' => $towerCountsByPulauSow,
             'towerCountsByAreaSow' => $towerCountsByAreaSow,
+            'towerCountsByAreaSowReg' => $towerCountsByAreaSowReg,
             'towerCountsByAreaB2S' => $towerCountsByAreaB2S,
             'towerCountsBySow' => $towerCountsBySow,
             'coloDataByKatTower' => $coloDataByKatTower,
@@ -238,5 +240,13 @@ class SalesOrderController extends Controller
             'towerCountsByStatusXL' => $towerCountsByStatusXL,
             'salesOrders' => $salesOrders
         ]);
+    }
+
+    public function deleteByYear($tahun)
+    {
+        // Hapus data SalesOrder berdasarkan tahun
+        SalesOrder::where('tahun', $tahun)->delete();
+
+        return redirect()->back()->with('success', 'Data Sales Order '.$tahun.' successfully deleted.');
     }
 }

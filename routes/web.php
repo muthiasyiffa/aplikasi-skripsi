@@ -49,4 +49,5 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/user-management/edit', [App\Http\Controllers\UserManagementController::class, 'edit'])->name('user-management.edit')->middleware('auth', 'verified');
     Route::put('/user-management', [App\Http\Controllers\UserManagementController::class, 'update'])->name('user-management.update')->middleware('auth', 'verified');
     Route::delete('/user-management/{user}', [App\Http\Controllers\UserManagementController::class, 'destroy'])->name('user-management.destroy')->middleware('auth', 'verified');
+    Route::get('/sales-order/{tahun}/delete', [App\Http\Controllers\SalesOrderController::class, 'deleteByYear'])->name('sales-order-delete.tahun')->middleware('auth', 'verified');
 });

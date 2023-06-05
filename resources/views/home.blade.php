@@ -8,7 +8,7 @@
                 <div class="card-header">{{ __('Total Tower Leased') }}</div>
                     <div class="col-md-6 p-4">
                         <div class="input-group">
-                            <textarea class="form-control" placeholder="Search" id="search-input"></textarea>
+                            <textarea class="form-control" placeholder="Search by Site ID Tenant" id="search-input"></textarea>
                             <div class="input-group-append mx-2">
                                 <button class="btn btn-outline-primary" type="button" id="search-button">Search</button>
                                 <button class="btn btn-primary" id="export-button">Export to Excel</button>
@@ -37,6 +37,9 @@
                     </div>
                     <div class="col">
                         <div class="card chart-cd shadow-sm">
+                            <button type="button" id="info-icon" class="btn btn-light" data-bs-toggle="popover" data-bs-placement="bottom">
+                                <i class="fas fa-info-circle"></i>
+                            </button>
                             <div class="chart-container">
                                 <canvas id="coloChart"></canvas>
                             </div>
@@ -307,6 +310,54 @@
             }
         });
 
+        const popover = new bootstrap.Popover(document.getElementById('info-icon'), {
+            container: 'body',
+            html: true,
+            content: function () {
+                // Mengambil data tower COLO
+                var regionalData = @json($towerCountsByAreaSowReg);
+
+                // Mengkategorikan tower sebagai Tower Akuisisi atau Tower B2S Mitratel
+                var area1 = ['SUMBAGSEL', 'SUMBAGTENG', 'SUMBAGUT'];
+                var area2 = ['JABODETABEK', 'JAWA BARAT'];
+                var area3 = ['BALINUSRA', 'JAWA TENGAH', 'JAWA TIMUR'];
+                var area4 = ['KALIMANTAN', 'SULMAPUA'];
+
+                // Mengelompokkan data berdasarkan area dan regional
+                var groupedData = {
+                    'Area 1': {},
+                    'Area 2': {},
+                    'Area 3': {},
+                    'Area 4': {}
+                };
+
+                // Mengelompokkan data per area dan regional
+                regionalData.forEach((data) => {
+                    var area = data.area;
+                    var regional = data.regional;
+                    var total = data.total;
+
+                    if (!groupedData[area][regional]) {
+                        groupedData[area][regional] = 0;
+                    }
+                    groupedData[area][regional] += total;
+                });
+
+                // Membuat konten popover
+                var content = '<b> Masing-masing area mencakup beberapa wilayah regional. Berikut cakupan wilayahnya :</b>';
+                content += '<br><br>'
+                Object.entries(groupedData).forEach(([area, regionalData]) => {
+                    content += '<b>' + area + '</b><br>';
+                    Object.entries(regionalData).forEach(([regional, total]) => {
+                        content += regional + ' : ' + total + '<br>';
+                    });
+                    content += '<br>';
+                });
+
+                return content;
+            }
+        });
+
         // Mengambil data tower colo per area dari controller
         var coloDataByArea = {!! json_encode($coloDataByArea) !!};
 
@@ -454,6 +505,12 @@
             font-size: 28px;
             font-weight: bold;
             text-align: center;
+        }
+
+        #info-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
         }
 
         .table-container {
