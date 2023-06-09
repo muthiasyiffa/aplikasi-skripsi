@@ -186,7 +186,12 @@
                     </div>
                 </div>
                 <div class="card m-4">
-                    <div class="card-header">Aging Order SPK to WO</div>
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>Aging Order SPK to WO</span>
+                        <button id="exportSPK" class="btn btn-primary ml-auto">
+                            <i class="fa fa-print"></i> Export
+                        </button>
+                    </div>
                     <div class= "filter">
                         <label for="filterCategory">Filter Data Aging</label>
                         <select id="filterCategorySPKWO">
@@ -1284,6 +1289,16 @@
         });
 
         applyFilterAndSort();
+
+        $("#exportSPK").on("click", function() {
+            var filterCategory = $("#filterCategorySPKWO").val();
+            var filterStatus = $("#filterStatusSPKWO").val();
+
+            var exportUrl = "{{ route('sales-order.exportSPK.tahun', ['tahun' => $tahun]) }}";
+            exportUrl += "?filterCategorySPKWO=" + filterCategory;
+            exportUrl += "&filterStatusSPKWO=" + filterStatus;
+            window.location.href = exportUrl;
+        });
     });
 
 //tabel aging WO-RFI

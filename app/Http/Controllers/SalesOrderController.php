@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\SalesOrderExport;
+use App\Exports\TableSPKagingExport;
 
 class SalesOrderController extends Controller
 {
@@ -64,6 +65,16 @@ class SalesOrderController extends Controller
 
         // Menggunakan SalesOrderExport dengan parameter $salesOrders
         return Excel::download(new SalesOrderExport($salesOrders), $filename);
+    }
+
+    public function exportSPK(Request $request, $tahun)
+    {
+        $selectedCategory = $request->input('filterCategorySPKWO');
+        $selectedStatus = $request->input('filterStatusSPKWO');
+
+        $filename = 'SPKData_' . $tahun . "_" . $selectedCategory .'.xlsx';
+
+        return Excel::download(new TableSPKagingExport($selectedCategory, $selectedStatus, $tahun), $filename);
     }
 
     public function show($tahun)

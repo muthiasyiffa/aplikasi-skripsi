@@ -42,6 +42,7 @@ Route::put('/profile', [App\Http\Controllers\ProfileController::class, 'update']
 Route::get('/sales-order/{tahun}', [App\Http\Controllers\SalesOrderController::class, 'show'])->name('sales-order.tahun')->middleware('auth', 'verified');
 Route::get('/sales-order/{tahun}/search', [App\Http\Controllers\SalesOrderController::class, 'search'])->name('sales-order-search.tahun')->middleware('auth', 'verified');
 Route::get('/sales-order/{tahun}/export', [App\Http\Controllers\SalesOrderController::class, 'exportToExcel'])->name('sales-order-export.tahun')->middleware('auth', 'verified');
+Route::get('/sales-order/{tahun}/exportSPK', [App\Http\Controllers\SalesOrderController::class, 'exportSPK'])->name('sales-order.exportSPK.tahun');
 
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
