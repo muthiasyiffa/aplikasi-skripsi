@@ -276,7 +276,12 @@
                 </div>
                 
                 <div class="card m-4">
-                    <div class="card-header">Aging Order WO to RFI</div>
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>Aging Order WO to RFI</span>
+                        <button id="exportWO" class="btn btn-primary ml-auto">
+                            <i class="fa fa-print"></i> Export
+                        </button>
+                    </div>
                     <div class= "filter">
                         <label for="filterCategory">Filter Data Aging</label>
                         <select id="filterCategoryWORFI">
@@ -394,7 +399,12 @@
                 </div>
 
                 <div class="card m-4">
-                    <div class="card-header">Aging Order RFI - BAK</div>
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>Aging Order RFI - BAK</span>
+                        <button id="exportRFI" class="btn btn-primary ml-auto">
+                            <i class="fa fa-print"></i> Export
+                        </button>
+                    </div>
                     <div class= "filter">
                         <label for="filterCategory">Filter Data Aging</label>
                         <select id="filterCategoryRFIBAK">
@@ -1358,6 +1368,18 @@
         });
 
         applyFilterAndSort();
+
+        $("#exportWO").on("click", function() {
+            var filterCategory = $("#filterCategoryWORFI").val();
+            var filterStatus = $("#filterStatusWORFI").val();
+            var filterSOW = $("#filterSOWWORFI").val();
+
+            var exportUrl = "{{ route('sales-order.exportWO.tahun', ['tahun' => $tahun]) }}";
+            exportUrl += "?filterCategoryWORFI=" + filterCategory;
+            exportUrl += "&filterStatusWORFI=" + filterStatus;
+            exportUrl += "&filterSOWWORFI=" + filterSOW;
+            window.location.href = exportUrl;
+        });
     });
 
 //tabel aging RFI-BAK
@@ -1414,6 +1436,16 @@
         });
 
         applyFilterAndSort();
+
+        $("#exportRFI").on("click", function() {
+            var filterCategory = $("#filterCategoryRFIBAK").val();
+            var filterStatus = $("#filterStatusRFIBAK").val();
+
+            var exportUrl = "{{ route('sales-order.exportRFI.tahun', ['tahun' => $tahun]) }}";
+            exportUrl += "?filterCategoryRFIBAK=" + filterCategory;
+            exportUrl += "&filterStatusRFIBAK=" + filterStatus;
+            window.location.href = exportUrl;
+        });
     });
 //search & export
     $(document).ready(function() {

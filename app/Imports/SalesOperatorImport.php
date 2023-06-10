@@ -64,7 +64,7 @@ class SalesOperatorImport implements ToModel, WithHeadingRow, WithMultipleSheets
         }
 
         $rfiDate = null;
-        if ($row['RFI DATE'] === null) {
+        if ($row['RFI DATE'] === null || $row['RFI DATE'] === '1/0/1900') {
             $rfiDate = '1900-01-01';
         } else if (is_numeric($row['RFI DATE'])) {
             $rfiDate = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['RFI DATE'])->format('Y-m-d');

@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Session;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\SalesOrderExport;
 use App\Exports\TableSPKagingExport;
+use App\Exports\TableWOagingExport;
+use App\Exports\TableRFIagingExport;
 
 class SalesOrderController extends Controller
 {
@@ -72,9 +74,30 @@ class SalesOrderController extends Controller
         $selectedCategory = $request->input('filterCategorySPKWO');
         $selectedStatus = $request->input('filterStatusSPKWO');
 
-        $filename = 'SPKData_' . $tahun . "_" . $selectedCategory .'.xlsx';
+        $filename = 'SPK-WO_DataAging_' . $tahun . "_" . $selectedCategory .'.xlsx';
 
         return Excel::download(new TableSPKagingExport($selectedCategory, $selectedStatus, $tahun), $filename);
+    }
+
+    public function exportWO(Request $request, $tahun)
+    {
+        $selectedCategory = $request->input('filterCategoryWORFI');
+        $selectedStatus = $request->input('filterStatusWORFI');
+        $selectedSOW = $request->input('filterSOWWORFI');
+
+        $filename = 'WO-RFI_DataAging_' . $tahun . "_" . $selectedCategory .'.xlsx';
+
+        return Excel::download(new TableWOagingExport($selectedCategory, $selectedStatus, $selectedSOW, $tahun), $filename);
+    }
+
+    public function exportRFI(Request $request, $tahun)
+    {
+        $selectedCategory = $request->input('filterCategoryRFIBAK');
+        $selectedStatus = $request->input('filterStatusRFIBAK');
+
+        $filename = 'RFI-BAK_DataAging_' . $tahun . "_" . $selectedCategory .'.xlsx';
+
+        return Excel::download(new TableRFIagingExport($selectedCategory, $selectedStatus, $tahun), $filename);
     }
 
     public function show($tahun)

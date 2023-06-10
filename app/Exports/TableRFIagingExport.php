@@ -8,11 +8,11 @@ use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class TableSPKagingExport implements FromQuery, WithHeadings, ShouldAutoSize
+class TableRFIagingExport implements FromQuery, WithHeadings, ShouldAutoSize
 {
     use Exportable;
 
-    private $columns = ['pid', 'site_id_tenant', 'site_name', 'status_xl', 'spk_date', 'wo_date', 'aging_spk_to_wo'];
+    private $columns = ['pid', 'site_id_tenant', 'site_name', 'status_xl', 'rfi_date', 'aging_rfi_to_bak'];
 
     public function __construct($selectedCategory, $selectedStatus, $tahun)
     {
@@ -23,19 +23,20 @@ class TableSPKagingExport implements FromQuery, WithHeadings, ShouldAutoSize
 
     public function query()
     {
-        $query = SalesOrder::select($this->columns)->where('tahun', $this->tahun);
+        $query = SalesOrder::select($this->columns)->where('tahun', $this->tahun)->whereIn('status_xl', ['RFI-NY BAUF', 'RFI-BAUF DONE']);
 
         if ($this->selectedCategory !== 'all') {
             if ($this->selectedCategory === 'Low Attention') {
-                $query->where('aging_spk_to_wo', '<=', 4);
+                $query->where('aging_rfi_to_bak', '<=', 14);
             } elseif ($this->selectedCategory === 'Attention') {
-                $query->whereBetween('aging_spk_to_wo', [5, 7]);
+                $query->whereBetween('aging_rfi_to_bak', [15, 25]);
             } elseif ($this->selectedCategory === 'Need More Attention') {
                 $query->where(function ($q) {
-                    $q->where('aging_spk_to_wo', '>', 7)
-                      ->orWhere('aging_spk_to_wo', 'Not yet SPK')
-                      ->orWhere('aging_spk_to_wo', 'Not yet WO')
-                      ->where('tahun', $this->tahun);
+                    $q->where('aging_rfi_to_bak', '>', 25)
+                      ->orWhere(function ($q2) {
+                          $q2->where('aging_rfi_to_bak', 'Not yet RFI')
+                             ->where('tahun', $this->tahun);
+                      });
                 });
             }
         }
@@ -54,9 +55,8 @@ class TableSPKagingExport implements FromQuery, WithHeadings, ShouldAutoSize
             'Site ID Tenant',
             'Site Name',
             'Status XL',
-            'SPK Date',
-            'WO Date',
-            'Aging SPK to WO',
+            'RFI Date',
+            'Aging RFI to BAK',
         ];
     }
 }
