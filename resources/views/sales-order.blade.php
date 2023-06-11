@@ -258,6 +258,8 @@
                             </table>
                         </div>
                     </div>
+                    <div class="summary-header">Summary</div>
+                    <div id="summaryText" class="summary-text"></div>
                     <div class="legend-container">
                         <label>Legend:</label>
                         <div class="legend-item">
@@ -366,34 +368,21 @@
                             </table>
                         </div>
                     </div>
+                    <div class="summary-header">Summary</div>
+                    <div id="summaryText1" class="summary-text"></div>
                     <div class="legend-container">
-                        <label>Legend B2S :</label>
+                        <label>Legend :</label>
                         <div class="legend-item">
                             <button class="btn btn-success aging-button btn-sm">Low Attention</button>
-                            <span>0 - 60 days</span>
+                            <span>B2S : < 60 days, COLO : < 20 days</span>
                         </div>
                         <div class="legend-item">
                             <button class="btn btn-warning aging-button btn-sm">Attention</button>
-                            <span>61 - 85 days</span>
+                            <span>B2S : 61 - 85 days, COLO : 21 - 40 days</span>
                         </div>
                         <div class="legend-item">
                             <button class="btn btn-danger aging-button btn-sm">Need More Attention</button>
-                            <span> > 85 days / Not yet WO / Not yet RFI</span>
-                        </div>
-                    </div>
-                    <div class="legend-container">
-                        <label>Legend COLO :</label>
-                        <div class="legend-item">
-                            <button class="btn btn-success aging-button btn-sm">Low Attention</button>
-                            <span>0 - 20 days</span>
-                        </div>
-                        <div class="legend-item">
-                            <button class="btn btn-warning aging-button btn-sm">Attention</button>
-                            <span>21 - 40 days</span>
-                        </div>
-                        <div class="legend-item">
-                            <button class="btn btn-danger aging-button btn-sm">Need More Attention</button>
-                            <span> > 40 days / Not yet WO / Not yet RFI</span>
+                            <span>B2S : > 85 days, COLO : > 40 days / NY-WO / NY-RFI</span>
                         </div>
                     </div>
                 </div>
@@ -468,6 +457,8 @@
                             </table>
                         </div>
                     </div>
+                    <div class="summary-header">Summary</div>
+                    <div id="summaryText2" class="summary-text"></div>
                     <div class="legend-container">
                         <label>Legend:</label>
                         <div class="legend-item">
@@ -1258,6 +1249,10 @@
             var selectedStatus = $("#filterStatusSPKWO").val();
             $("#agingSPKTable tbody tr").hide();
 
+            var lowAttentionCount = 0;
+            var attentionCount = 0;
+            var moreAttentionCount = 0;
+
             $("#agingSPKTable tbody tr").each(function() {
                 var category = $(this).find(".contain-header button").text();
                 var status = $(this).find(".contain-header:nth-child(5)").text();
@@ -1269,7 +1264,23 @@
                 if (showRow) {
                     $(this).show();
                 }
+
+                // Menghitung jumlah kategori
+                if (category === "Low Attention") {
+                    lowAttentionCount++;
+                } else if (category === "Attention") {
+                    attentionCount++;
+                } else if (category === "Need More Attention") {
+                    moreAttentionCount++;
+                }
             });
+
+            // Memperbarui konten pada elemen summaryText
+            var summaryText = "Low Attention : " + lowAttentionCount + " Site <br>";
+            summaryText += "Attention : " + attentionCount + " Site <br>";
+            summaryText += "Need More Attention : " + moreAttentionCount + " Site";
+
+            $("#summaryText").html(summaryText);
 
             var rows = $("#agingSPKTable tbody tr:visible").get();
             rows.sort(function(a, b) {
@@ -1325,6 +1336,10 @@
             var selectedSOW = $("#filterSOWWORFI").val();
             $("#agingWOTable tbody tr").hide();
 
+            var lowAttentionCount = 0;
+            var attentionCount = 0;
+            var moreAttentionCount = 0;
+
             $("#agingWOTable tbody tr").each(function() {
                 var category = $(this).find(".contain-header button").text();
                 var sow = $(this).find(".contain-header:nth-child(5)").text().trim();
@@ -1338,7 +1353,23 @@
                 if (showRow) {
                     $(this).show();
                 }
+
+                // Menghitung jumlah kategori
+                if (category === "Low Attention") {
+                    lowAttentionCount++;
+                } else if (category === "Attention") {
+                    attentionCount++;
+                } else if (category === "Need More Attention") {
+                    moreAttentionCount++;
+                }
             });
+
+            // Memperbarui konten pada elemen summaryText
+            var summaryText = "Low Attention : " + lowAttentionCount + " Site <br>";
+            summaryText += "Attention : " + attentionCount + " Site <br>";
+            summaryText += "Need More Attention : " + moreAttentionCount + " Site";
+
+            $("#summaryText1").html(summaryText);
 
             var rows = $("#agingWOTable tbody tr:visible").get();
             rows.sort(function(a, b) {
@@ -1395,6 +1426,10 @@
             var selectedStatus = $("#filterStatusRFIBAK").val();
             $("#agingRFITable tbody tr").hide();
 
+            var lowAttentionCount = 0;
+            var attentionCount = 0;
+            var moreAttentionCount = 0;
+
             $("#agingRFITable tbody tr").each(function() {
                 var category = $(this).find(".contain-header button").text();
                 var status = $(this).find(".contain-header:nth-child(5)").text();
@@ -1406,7 +1441,23 @@
                 if (showRow) {
                     $(this).show();
                 }
+
+                // Menghitung jumlah kategori
+                if (category === "Low Attention") {
+                    lowAttentionCount++;
+                } else if (category === "Attention") {
+                    attentionCount++;
+                } else if (category === "Need More Attention") {
+                    moreAttentionCount++;
+                }
             });
+
+            // Memperbarui konten pada elemen summaryText
+            var summaryText = "Low Attention : " + lowAttentionCount + " Site <br>";
+            summaryText += "Attention : " + attentionCount + " Site <br>";
+            summaryText += "Need More Attention : " + moreAttentionCount + " Site";
+
+            $("#summaryText2").html(summaryText);
 
             var rows = $("#agingRFITable tbody tr:visible").get();
             rows.sort(function(a, b) {
@@ -1658,7 +1709,7 @@
             margin-right: 10px;
         }
 
-        .legend-container {
+        .legend-container, .summary-text {
             display: flex;
             align-items: center;
             padding-left: 29px;
@@ -1666,8 +1717,20 @@
             font-weight: bold;
         }
 
+        .summary-header {
+            align-items: center;
+            padding-left: 29px;
+            font-weight: bolder;
+            font-size: 15px;
+            text-decoration: underline overline dotted;
+        }
+
         .legend-container label {
             font-size: 15px;
+        }
+
+        .legend-container span {
+            font-size: 14px;
         }
 
         .legend-item {
