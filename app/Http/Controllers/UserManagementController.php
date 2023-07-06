@@ -26,6 +26,30 @@ class UserManagementController extends Controller
         return view('user.edit', compact('users'));
     }
 
+    public function create()
+    {
+        return view('user.create');
+    }
+
+    public function store(Request $request)
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = User::create([
+            'name' => $validatedData['name'],
+            'email' => $validatedData['email'],
+            'password' => bcrypt($validatedData['password']),
+        ]);
+
+        // Tambahkan logika tambahan jika diperlukan
+
+        return redirect()->route('user-management')->with('success', 'User created successfully.');
+    }
+
     public function update(Request $request, User $user)
     {
         $usersData = $request->input('users');

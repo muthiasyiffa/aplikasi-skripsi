@@ -5,7 +5,10 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{ __('User Management') }}</div>
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>User Management</span>
+                    <a href="{{ route('user-management.create') }}" class="btn btn-primary ml-auto">Create New User</a>
+                </div>
                 @if(session('success'))
                     <div class="alert alert-success">
                         {{ session('success') }}
