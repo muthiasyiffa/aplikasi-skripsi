@@ -155,7 +155,7 @@ class SalesOperatorImport implements ToModel, WithHeadingRow, WithMultipleSheets
                     $data['final_status_site'] = 'RFI';
                     break;
                 case 'Completed':
-                    $data['status_xl'] = 'BAK Compeleted';
+                    $data['status_xl'] = 'BAK Completed';
                     $data['final_status_site'] = 'RFI';
                     break;
                 case 'SPK Returned':

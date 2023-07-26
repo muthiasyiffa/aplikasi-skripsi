@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NewUserEmail;
 
 class UserManagementController extends Controller
 {
@@ -45,7 +47,7 @@ class UserManagementController extends Controller
             'password' => bcrypt($validatedData['password']),
         ]);
 
-        // Tambahkan logika tambahan jika diperlukan
+        Mail::to($user->email)->send(new NewUserEmail($user));
 
         return redirect()->route('user-management')->with('success', 'User created successfully.');
     }
